@@ -76,10 +76,15 @@ function init()
    // Make CCs 2-119 freely mappable for all 16 Channels
    userControls = host.createUserControlsSection((HIGHEST_CC - LOWEST_CC + 1)*16);
 
+	 
    for(var i=LOWEST_CC; i<=HIGHEST_CC; i++)
    {
 			for (var j=1; j<=16; j++) {
-				 userControls.getControl(i - LOWEST_CC).setLabel("CC " + i + " - Channel " + j);
+				 
+				 // Create the index variable c
+				 var c = i - LOWEST_CC + (j-1) * (HIGHEST_CC-LOWEST_CC+1);
+				 // Set a label/name for each userControl
+				 userControls.getControl(c).setLabel("CC " + i + " - Channel " + j);
 			}
    }
 }
