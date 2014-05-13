@@ -20,6 +20,7 @@ Non-Specific Controllers:
 - Generic Midi Keyboard InOut (Omni, all CCs mappable, Midi Beat Clock...)
 - TomsGenericKeyboard (16 separate Midi Channels, Midi Beat Clock, all CCs mappable...)
 - TomsGenericMultiControl (16 separate Midi Channels, Midi Beat Clock, all CCs mappable per Midi Channel...)
+- TomsMultiBiController (16 separate Midi Channels, Midi Beat Clock, all CCs mappable per Midi Channel, Bidirectional Feedback for CCs...)
 
 Enjoy!
 
