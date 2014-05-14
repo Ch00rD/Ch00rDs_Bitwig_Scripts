@@ -9,16 +9,16 @@ loadAPI(1);
 
 host.defineController("TomsScripts", "TomsMultiBiController", "1.0", "f03747e0-d9f0-11e3-9c1a-0800200c9a66");
 host.defineMidiPorts(1, 1);
-// enter the names for your controllers Midi In- and Output here if you want autodetection:
+// enter the names for your controllers Midi In and Out ports here if you want autodetection:
 host.addDeviceNameBasedDiscoveryPair(["YourMidiInPortNameHere"], ["YourMidiOutPortNameHere"]);
 
 // CC 0 and CCs 120+ are reserved
 var LOWEST_CC = 1;
 var HIGHEST_CC = 119;
 
-// Two variables to hold the Values of all the CCs and to check if they have changed
-var ccValue = initArray(0, 119*16);
-var ccValueOld = initArray(0, 119*16);
+// Two array-variables to hold the values of all the CCs and to check if they have changed
+var ccValue = initArray(0, ((HIGHEST_CC - LOWEST_CC + 1)*16));
+var ccValueOld = initArray(0, ((HIGHEST_CC - LOWEST_CC + 1)*16));
 
 // A function to create an indexed function for the Observers
 function getValueObserverFunc(index, varToStore)
@@ -32,7 +32,11 @@ function getValueObserverFunc(index, varToStore)
 function init()
 {
 	 
-	 // Create 16 NoteInputs + Omni. Verbose to allow commenting out unneeded channels
+	 // Create 16 NoteInputs + Omni.
+	 // Verbose to allow commenting out unneeded channels
+	 // To do so, put "//" in front of the lines containing channels you don't want to use
+	 // Be sure to do it for the "createNoteInput" lines as well as the corresponding
+	 // "setShouldConsumeEvents" and "assignPolyphonicAftertouchToExpression" lines below
 	 MultiBi   = host.getMidiInPort(0).createNoteInput("MultiBi - Omni", "??????");
    MultiBi1  = host.getMidiInPort(0).createNoteInput("MultiBi - Ch 1", "?0????");
    MultiBi2  = host.getMidiInPort(0).createNoteInput("MultiBi - Ch 2", "?1????");
@@ -51,7 +55,7 @@ function init()
    MultiBi15 = host.getMidiInPort(0).createNoteInput("MultiBi - Ch 15", "?E????");
    MultiBi16 = host.getMidiInPort(0).createNoteInput("MultiBi - Ch 16", "?F????");
 	 
-	 // Disable the consuming of the events by the NoteInputs, so they are also available for mapping
+	 // Disable the consuming of events by the NoteInputs, so they are also available for mapping
 	 MultiBi.setShouldConsumeEvents(false);
 	 MultiBi1.setShouldConsumeEvents(false);
 	 MultiBi2.setShouldConsumeEvents(false);
@@ -70,7 +74,7 @@ function init()
    MultiBi15.setShouldConsumeEvents(false);
    MultiBi16.setShouldConsumeEvents(false);
 	 
-	 // Enable Poly AT translation into Timbre for the internl BWS instruments
+	 // Enable Poly AT translation into Timbre for the internal BWS instruments
 	 MultiBi.assignPolyphonicAftertouchToExpression(0,   NoteExpression.TIMBRE_UP, 5);	 
 	 MultiBi1.assignPolyphonicAftertouchToExpression(0,   NoteExpression.TIMBRE_UP, 5);
 	 MultiBi2.assignPolyphonicAftertouchToExpression(1,   NoteExpression.TIMBRE_UP, 5);
@@ -112,10 +116,6 @@ function init()
    }
 }
 
-function exit()
-{
-}
-
 // Updates the controller in an orderly manner when needed
 // so that LEDs, Motors etc. react to changes in the Software
 // without drowning the Controller with data
@@ -136,7 +136,7 @@ function flush()
    }
 }
 
-// Update the UserControlls when Midi Data is received
+// Update the UserControls when Midi Data is received
 function onMidi(status, data1, data2)
 {
 	 //printMidi(status, data1, data2);
@@ -154,4 +154,9 @@ function onMidi(status, data1, data2)
 function onSysex(data)
 {
 	//printSysex(data);
+}
+
+function exit()
+{
+	 // nothing to do here ;-)
 }
