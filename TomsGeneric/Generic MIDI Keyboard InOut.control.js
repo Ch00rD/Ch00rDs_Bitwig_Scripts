@@ -12,9 +12,10 @@ var HIGHEST_CC = 119;
 function init()
 {
    Generic =host.getMidiInPort(0).createNoteInput("MIDI Keyboard InOut", "??????");
-	 Generic.setShouldConsumeEvents(false);
+	Generic.setShouldConsumeEvents(false);
+	Generic.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 12);
 
- 	 host.getMidiOutPort(0).setShouldSendMidiBeatClock;
+ 	host.getMidiOutPort(0).setShouldSendMidiBeatClock;
    host.getMidiInPort(0).setMidiCallback(onMidi);
 
    // Make CCs 2-119 freely mappable
