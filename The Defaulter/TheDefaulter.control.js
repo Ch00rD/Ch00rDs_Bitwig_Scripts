@@ -1,8 +1,17 @@
+// "The Defaulter" is a script to set project defaults on startup and when creating new projects.
+// Second, the settings are mirrored in the IO panel and saved with the document, so it's last state is restored on reload.
+//
+// Thomas Helzle - 2014
+
 loadAPI(1);
 
-host.defineController("TomsScripts", "Defaulter", "1.0", "002c5ce0-dd01-11e3-8b68-0800200c9a66", "Thomas Helzle");
+host.defineController("TomsScripts", "The Defaulter", "1.0", "002c5ce0-dd01-11e3-8b68-0800200c9a66", "Thomas Helzle");
 //host.defineMidiPorts(1, 1);
 //host.addDeviceNameBasedDiscoveryPair(["Scarlett 18i20 USB"], ["Scarlett 18i20 USB"]);
+
+// Constants:
+const YESNO = ["Yes", "No"];
+const VIEWS = ["ARRANGE", "MIX", "EDIT"];
 
 // Views etc.
 var application = null;
@@ -26,7 +35,7 @@ var defaultGreetingPref = null;
 var isInit = true;
 var defaultGreeting = "Happy Bitwiggin' ;-)";
 var defaultViewPref = null;
-var defaultView = "Arrange";
+var defaultView = VIEWS[0];
 
 // Default Arranger View:
 var defaultClipLauncherPref = null;
@@ -39,8 +48,6 @@ var defaultEffectsPref = null;
 var defaultEffects = true;
 var defaultDoubleHeightPref = null;
 var defaultDoubleHeight = true;
-//var defaultHideHiddenPref = null;
-//var defaultHideHidden = false;
 var defaultCueMarkersPref = null;
 var defaultCueMarkers = false;
 var defaultPlaybackFollowPref = null;
@@ -59,8 +66,6 @@ var defaultMixIOPref = null;
 var defaultMixIO = true;
 var defaultMixABPref = null;
 var defaultMixAB = false;
-//var defaultBrowserPanelPref = null;
-//var defaultBrowserPanel = "Browser";
 var defaultInstrumentTracksPref = null;
 var defaultInstrumentTracks = 2;
 var defaultAudioTracksPref = null;
@@ -69,10 +74,11 @@ var defaultEffectTracksPref = null;
 var defaultEffectTracks = 2;
 
 // Per Document Settings:
-var projectMessageDoc = null;
-var projectMessage = "";
+var documentMessagePref = null;
+var documentMessage = "";
 var documentViewPref = null;
-var documentView = "Arrange";
+var documentView = VIEWS[0];
+var currentView = VIEWS[0];
 
 // Document Arranger View:
 var documentClipLauncherPref = null;
@@ -106,10 +112,7 @@ var documentMixAB = false;
 
 // Other Variables:
 var currentChannelCount = 0;
-
-const YESNO = ["Yes", "No"];
-const VIEWS = ["Arrange", "Mix", "Edit"];
-const BROWSERVIEWS = ["Browser", "Project", "IO Panel"];
+var projectName = "";
 
 
 function init() {
@@ -118,275 +121,302 @@ function init() {
    application = host.createApplication();
    arranger = host.createArranger();
    bTrack = host.createTrackBank(8, 8, 8);
-   bScene = host.createSceneBank(8);
-   cTrack = host.createArrangerCursorTrack(1, 0);
-   cDevice = cTrack.getPrimaryDevice();
-   ccDevice = host.createCursorDevice();
-   cSlots = cTrack.getClipLauncherSlots();
    cMix = host.createMixer("MIX", 0);
-   cClip = host.createCursorClip(1, 1);
    transport = host.createTransport();
 
+   // The object for the Controller Preferences:
    prefs = host.getPreferences();
+   // And for the Document Preferences:
    doc = host.getDocumentState();
 
-   // Observer:
-   bTrack.addChannelCountObserver(function(value){
+   // General Observers:
+   bTrack.addChannelCountObserver(function (value) {
       currentChannelCount = value;
    });
 
-   application.addPanelLayoutObserver(function (name) {
-      //println(name);
-   }, 50);
-
-   application.addProjectNameObserver(function (name) {
-      if(name === "Untitled" && enableDefaults) {
-         //setDefaults();
-      }
-   }, 100);
-
-   // Preferences:
+   // Creating all the Preferences:
+   // Global:
    enableDefaultsPref = prefs.getEnumSetting("Enable New Document Default", "Global", YESNO, "Yes");
    enableDefaultsPref.addValueObserver(function (value) {
-      if(value === "Yes"){
+      if (value === "Yes") {
          enableDefaults = true;
          setPrefsVisible(true);
-         isInit ? isInit = false : setDefaults();
       }
-      else{
-         setPrefsVisible(false);
+      else {
          enableDefaults = false;
+         setPrefsVisible(false);
       }
    });
 
-   defaultGreetingPref = prefs.getStringSetting("Startup Greeting", "Global", 140, "Happy Bitwiggin' :-)");
-   defaultGreetingPref.addValueObserver(function(value){
+   defaultGreetingPref = prefs.getStringSetting("Startup Greeting (empty for none)", "Global", 140, "Happy Bitwiggin' :-)");
+   defaultGreetingPref.addValueObserver(function (value) {
       defaultGreeting = value;
-      if(isInit){
-         if(defaultGreeting){
+      if (isInit) {
+         isInit = false;
+         if (defaultGreeting) {
             host.showPopupNotification(defaultGreeting);
-            isInit = false; //where should this go?
          }
       }
    });
 
-   defaultViewPref = prefs.getEnumSetting("Initial View", "View Defaults", VIEWS,  "Arrange");
+   defaultViewPref = prefs.getEnumSetting("Initial View", "View Defaults", VIEWS, VIEWS[0]);
    defaultViewPref.addValueObserver(function (value) {
       defaultView = value;
    });
 
+   // Arranger Settings:
    defaultClipLauncherPref = prefs.getEnumSetting("ClipLauncher Visible", "Arranger View", YESNO, "No");
-   defaultClipLauncherPref.addValueObserver(function(value){
+   defaultClipLauncherPref.addValueObserver(function (value) {
       defaultClipLauncher = (value === "Yes");
    });
    defaultTimelinePref = prefs.getEnumSetting("Timeline Visible", "Arranger View", YESNO, "Yes");
-   defaultTimelinePref.addValueObserver(function(value){
+   defaultTimelinePref.addValueObserver(function (value) {
       defaultTimeline = (value === "Yes");
    });
    defaultIOPref = prefs.getEnumSetting("Channel IO Visible", "Arranger View", YESNO, "No");
-   defaultIOPref.addValueObserver(function(value){
+   defaultIOPref.addValueObserver(function (value) {
       defaultIO = (value === "Yes");
    });
    defaultEffectsPref = prefs.getEnumSetting("Effect Tracks Visible", "Arranger View", YESNO, "Yes");
-   defaultEffectsPref.addValueObserver(function(value){
+   defaultEffectsPref.addValueObserver(function (value) {
       defaultEffects = (value === "Yes");
    });
    defaultDoubleHeightPref = prefs.getEnumSetting("Tracks Double Height", "Arranger View", YESNO, "Yes");
-   defaultDoubleHeightPref.addValueObserver(function(value){
+   defaultDoubleHeightPref.addValueObserver(function (value) {
       defaultDoubleHeight = (value === "Yes");
    });
    defaultCueMarkersPref = prefs.getEnumSetting("Cue Markers Visible", "Arranger View", YESNO, "No");
-   defaultCueMarkersPref.addValueObserver(function(value){
+   defaultCueMarkersPref.addValueObserver(function (value) {
       defaultCueMarkers = (value === "Yes");
    });
    defaultPlaybackFollowPref = prefs.getEnumSetting("Playback Follow Active", "Arranger View", YESNO, "No");
-   defaultPlaybackFollowPref.addValueObserver(function(value){
+   defaultPlaybackFollowPref.addValueObserver(function (value) {
       defaultPlaybackFollow = (value === "Yes");
    });
 
    // Mixer View Settings:
    defaultMixClipsPref = prefs.getEnumSetting("Clips Visible", "Mixer View", YESNO, "Yes");
-   defaultMixClipsPref.addValueObserver(function(value){
+   defaultMixClipsPref.addValueObserver(function (value) {
       defaultMixClips = (value === "Yes");
    });
    defaultMixMetersPref = prefs.getEnumSetting("Big Meters Visible", "Mixer View", YESNO, "No");
-   defaultMixMetersPref.addValueObserver(function(value){
+   defaultMixMetersPref.addValueObserver(function (value) {
       defaultMixMeters = (value === "Yes");
    });
    defaultMixDevicePref = prefs.getEnumSetting("Device Chain Visible", "Mixer View", YESNO, "Yes");
-   defaultMixDevicePref.addValueObserver(function(value){
+   defaultMixDevicePref.addValueObserver(function (value) {
       defaultMixDevice = (value === "Yes");
    });
    defaultMixSendsPref = prefs.getEnumSetting("Sends Visible", "Mixer View", YESNO, "Yes");
-   defaultMixSendsPref.addValueObserver(function(value){
+   defaultMixSendsPref.addValueObserver(function (value) {
       defaultMixSends = (value === "Yes");
    });
    defaultMixIOPref = prefs.getEnumSetting("IO Section Visible", "Mixer View", YESNO, "Yes");
-   defaultMixIOPref.addValueObserver(function(value){
+   defaultMixIOPref.addValueObserver(function (value) {
       defaultMixIO = (value === "Yes");
    });
    defaultMixABPref = prefs.getEnumSetting("A/B Faders Visible", "Mixer View", YESNO, "No");
-   defaultMixABPref.addValueObserver(function(value){
+   defaultMixABPref.addValueObserver(function (value) {
       defaultMixAB = (value === "Yes");
    });
-   //defaultBrowserPanelPref = prefs.getEnumSetting("Default Browser Panel", "View Defaults", BROWSERVIEWS, "Browser");
-   //defaultBrowserPanelPref.addValueObserver(function(value){
-   //   defaultBrowserPanel = value;
-   //});
+
 
    defaultInstrumentTracksPref = prefs.getNumberSetting("Instrument Tracks", "Tracks", 1, 25, 1, "Tracks", 2);
-   defaultInstrumentTracksPref.addValueObserver(1, function(value){
+   defaultInstrumentTracksPref.addValueObserver(1, function (value) {
       defaultInstrumentTracks = value;
    });
    defaultAudioTracksPref = prefs.getNumberSetting("Audio Tracks", "Tracks", 1, 25, 1, "Tracks", 2);
-   defaultAudioTracksPref.addValueObserver(1, function(value){
+   defaultAudioTracksPref.addValueObserver(1, function (value) {
       defaultAudioTracks = value;
    });
    defaultEffectTracksPref = prefs.getNumberSetting("Effect Tracks", "Tracks", 1, 25, 1, "Tracks", 2);
-   defaultEffectTracksPref.addValueObserver(1, function(value){
+   defaultEffectTracksPref.addValueObserver(1, function (value) {
       defaultEffectTracks = value;
    });
 
    // Document Settings:
-   projectMessageDoc = doc.getStringSetting("Startup Message", "Global", 500, "");
-   projectMessageDoc.addValueObserver(function(value){
-      projectMessage = value;
-      if(projectMessage){
-         host.showPopupNotification(projectMessage);
+   // Global:
+   documentMessagePref = doc.getStringSetting("Startup Message", "Global", 500, "");
+   documentMessagePref.addValueObserver(function (value) {
+      documentMessage = value;
+      if (documentMessage) {
+         host.showPopupNotification(documentMessage);
       }
    });
-   documentViewPref = doc.getEnumSetting("Initial View", "View documents", VIEWS,  "Arrange");
+   documentViewPref = doc.getEnumSetting("Initial View", "Layout", VIEWS, VIEWS[0]);
    documentViewPref.addValueObserver(function (value) {
-      documentView = value;
-      switch(documentView) {
-         case "Arrange":
-            application.setPanelLayout("ARRANGE");
-            break;
-         case "Mix":
-            application.setPanelLayout("MIX");
-            break;
-         case "Edit":
-            application.setPanelLayout("EDIT");
-            break;
+      println(value);
+      if(documentView != value){
+         documentView = value;
+         application.setPanelLayout(value);
       }
    });
+   application.addPanelLayoutObserver(function (view) {
+      println(view);
+      if (currentView != view) {
+         currentView = view;
+         documentViewPref.set(view);
+      }
+   }, 50);
 
+   // Arranger Settings:
    documentClipLauncherPref = doc.getEnumSetting("ClipLauncher Visible", "Arranger View", YESNO, "No");
-   documentClipLauncherPref.addValueObserver(function(value){
+   documentClipLauncherPref.addValueObserver(function (value) {
       documentClipLauncher = (value === "Yes");
       arranger.isClipLauncherVisible().set(documentClipLauncher);
    });
-   arranger.isClipLauncherVisible().addValueObserver(function(value){
-      if(documentClipLauncher != value){
+   arranger.isClipLauncherVisible().addValueObserver(function (value) {
+      if (documentClipLauncher != value) {
          documentClipLauncherPref.set(value ? "Yes" : "No");
       }
    });
    documentTimelinePref = doc.getEnumSetting("Timeline Visible", "Arranger View", YESNO, "Yes");
-   documentTimelinePref.addValueObserver(function(value){
+   documentTimelinePref.addValueObserver(function (value) {
       documentTimeline = (value === "Yes");
       arranger.isTimelineVisible().set(documentTimeline);
    });
-   arranger.isTimelineVisible().addValueObserver(function(value){
-      if(documentTimeline != value) {
+   arranger.isTimelineVisible().addValueObserver(function (value) {
+      if (documentTimeline != value) {
          documentTimelinePref.set(value ? "Yes" : "No");
       }
    });
    documentIOPref = doc.getEnumSetting("Channel IO Visible", "Arranger View", YESNO, "No");
-   documentIOPref.addValueObserver(function(value){
+   documentIOPref.addValueObserver(function (value) {
       documentIO = (value === "Yes");
       arranger.isIoSectionVisible().set(documentIO);
    });
-   arranger.isIoSectionVisible().addValueObserver(function(value){
-      if(documentIO != value){
+   arranger.isIoSectionVisible().addValueObserver(function (value) {
+      if (documentIO != value) {
          documentIOPref.set(value ? "Yes" : "No");
       }
    });
    documentEffectsPref = doc.getEnumSetting("Effect Tracks Visible", "Arranger View", YESNO, "Yes");
-   documentEffectsPref.addValueObserver(function(value){
+   documentEffectsPref.addValueObserver(function (value) {
       documentEffects = (value === "Yes");
       arranger.areEffectTracksVisible().set(documentEffects);
    });
-   arranger.areEffectTracksVisible().addValueObserver(function(value){
-      if(documentEffects != value){
+   arranger.areEffectTracksVisible().addValueObserver(function (value) {
+      if (documentEffects != value) {
          documentEffectsPref.set(value ? "Yes" : "No");
       }
    });
    documentDoubleHeightPref = doc.getEnumSetting("Tracks Double Height", "Arranger View", YESNO, "Yes");
-   documentDoubleHeightPref.addValueObserver(function(value){
+   documentDoubleHeightPref.addValueObserver(function (value) {
       documentDoubleHeight = (value === "Yes");
       arranger.hasDoubleRowTrackHeight().set(documentDoubleHeight);
    });
-   arranger.hasDoubleRowTrackHeight().addValueObserver(function(value){
+   arranger.hasDoubleRowTrackHeight().addValueObserver(function (value) {
       if (documentDoubleHeight != value) {
          documentDoubleHeightPref.set(value ? "Yes" : "No");
       }
    });
    documentCueMarkersPref = doc.getEnumSetting("Cue Markers Visible", "Arranger View", YESNO, "No");
-   documentCueMarkersPref.addValueObserver(function(value){
+   documentCueMarkersPref.addValueObserver(function (value) {
       documentCueMarkers = (value === "Yes");
       arranger.areCueMarkersVisible().set(documentCueMarkers);
    });
-   arranger.areCueMarkersVisible().addValueObserver(function(value){
-      if(documentCueMarkers != value){
+   arranger.areCueMarkersVisible().addValueObserver(function (value) {
+      if (documentCueMarkers != value) {
          documentCueMarkersPref.set(value ? "Yes" : "No");
       }
    });
    documentPlaybackFollowPref = doc.getEnumSetting("Playback Follow Active", "Arranger View", YESNO, "No");
-   documentPlaybackFollowPref.addValueObserver(function(value){
+   documentPlaybackFollowPref.addValueObserver(function (value) {
       documentPlaybackFollow = (value === "Yes");
       arranger.isPlaybackFollowEnabled().set(documentPlaybackFollow);
    });
-   arranger.isPlaybackFollowEnabled().addValueObserver(function(value){
-      if(documentPlaybackFollow != value){
+   arranger.isPlaybackFollowEnabled().addValueObserver(function (value) {
+      if (documentPlaybackFollow != value) {
          documentPlaybackFollowPref.set(value ? "Yes" : "No");
       }
    });
 
    // Mixer View Settings:
    documentMixClipsPref = doc.getEnumSetting("Clips Visible", "Mixer View", YESNO, "Yes");
-   documentMixClipsPref.addValueObserver(function(value){
+   documentMixClipsPref.addValueObserver(function (value) {
       documentMixClips = (value === "Yes");
       cMix.isClipLauncherSectionVisible().set(documentMixClips);
    });
+   cMix.isClipLauncherSectionVisible().addValueObserver(function (value) {
+      if (documentMixClips != value) {
+         documentMixClipsPref.set(value ? "Yes" : "No");
+      }
+   });
    documentMixMetersPref = doc.getEnumSetting("Big Meters Visible", "Mixer View", YESNO, "No");
-   documentMixMetersPref.addValueObserver(function(value){
+   documentMixMetersPref.addValueObserver(function (value) {
       documentMixMeters = (value === "Yes");
       cMix.isMeterSectionVisible().set(documentMixMeters);
    });
+   cMix.isMeterSectionVisible().addValueObserver(function (value) {
+      if (documentMixMeters != value) {
+         documentMixMetersPref.set(value ? "Yes" : "No");
+      }
+   });
    documentMixDevicePref = doc.getEnumSetting("Device Chain Visible", "Mixer View", YESNO, "Yes");
-   documentMixDevicePref.addValueObserver(function(value){
+   documentMixDevicePref.addValueObserver(function (value) {
       documentMixDevice = (value === "Yes");
       cMix.isDeviceSectionVisible().set(documentMixDevice);
    });
+   cMix.isDeviceSectionVisible().addValueObserver(function (value) {
+      if (documentMixDevice != value) {
+         documentMixDevicePref.set(value ? "Yes" : "No");
+      }
+   });
    documentMixSendsPref = doc.getEnumSetting("Sends Visible", "Mixer View", YESNO, "Yes");
-   documentMixSendsPref.addValueObserver(function(value){
+   documentMixSendsPref.addValueObserver(function (value) {
       documentMixSends = (value === "Yes");
       cMix.isSendSectionVisible().set(documentMixSends);
    });
+   cMix.isSendSectionVisible().addValueObserver(function (value) {
+      if (documentMixSends != value) {
+         documentMixSendsPref.set(value ? "Yes" : "No");
+      }
+   });
    documentMixIOPref = doc.getEnumSetting("IO Section Visible", "Mixer View", YESNO, "Yes");
-   documentMixIOPref.addValueObserver(function(value){
+   documentMixIOPref.addValueObserver(function (value) {
       documentMixIO = (value === "Yes");
-      cMix.isIoSectionVisible().set(documentIO);
+      cMix.isIoSectionVisible().set(documentMixIO);
+   });
+   cMix.isIoSectionVisible().addValueObserver(function (value) {
+      if (documentMixIO != value) {
+         documentMixIOPref.set(value ? "Yes" : "No");
+      }
    });
    documentMixABPref = doc.getEnumSetting("A/B Faders Visible", "Mixer View", YESNO, "No");
-   documentMixABPref.addValueObserver(function(value){
+   documentMixABPref.addValueObserver(function (value) {
       documentMixAB = (value === "Yes");
       cMix.isCrossFadeSectionVisible().set(documentMixAB);
    });
+   cMix.isCrossFadeSectionVisible().addValueObserver(function (value) {
+      if (documentMixAB != value) {
+         documentMixABPref.set(value ? "Yes" : "No");
+      }
+   });
 
-   actions = application.getActions();
+   //actions = application.getActions();
    //for (var a = 0; a < actions.length; a++) {
    //   println(a + actions[a].getName());
    //}
 
-   //host.scheduleTask(abFader, null, 100);
+   application.addProjectNameObserver(function (name) {
+      projectName = name;
+      host.scheduleTask(delayedSetter, null, 500);
+   }, 100);
 
-   //host.scheduleTask(setup, null, 1000);
+   if(defaultGreeting) {
+      host.showPopupNotification(defaultGreeting);
+   }
 
-
+   host.scheduleTask(delayedSetter, null, 500);
 }
 
-function setPrefsVisible (on){
+function delayedSetter() {
+   if (projectName === "Untitled" && enableDefaults && currentChannelCount === 4) {
+      setDefaults();
+   }
+}
+
+function setPrefsVisible(on) {
    // View:
    on ? defaultGreetingPref.enable() : defaultGreetingPref.disable();
    on ? defaultViewPref.enable() : defaultViewPref.disable();
@@ -412,19 +442,30 @@ function setPrefsVisible (on){
    on ? defaultEffectTracksPref.enable() : defaultEffectTracksPref.disable();
 }
 
+//function setDocPrefsVisible(on) {
+//   // View:
+//   on ? documentMessagePref.enable() : documentMessagePref.disable();
+//   on ? documentViewPref.enable() : documentViewPref.disable();
+//   // Arranger:
+//   on ? documentClipLauncherPref.enable() : documentClipLauncherPref.disable();
+//   on ? documentTimelinePref.enable() : documentTimelinePref.disable();
+//   on ? documentIOPref.enable() : documentIOPref.disable();
+//   on ? documentEffectsPref.enable() : documentEffectsPref.disable();
+//   on ? documentDoubleHeightPref.enable() : documentDoubleHeightPref.disable();
+//   on ? documentCueMarkersPref.enable() : documentCueMarkersPref.disable();
+//   on ? documentPlaybackFollowPref.enable() : documentPlaybackFollowPref.disable();
+//   // Mixer:
+//   on ? documentMixClipsPref.enable() : documentMixClipsPref.disable();
+//   on ? documentMixMetersPref.enable() : documentMixMetersPref.disable();
+//   on ? documentMixDevicePref.enable() : documentMixDevicePref.disable();
+//   on ? documentMixSendsPref.enable() : documentMixSendsPref.disable();
+//   on ? documentMixIOPref.enable() : documentMixIOPref.disable();
+//   on ? documentMixABPref.enable() : documentMixABPref.disable();
+//}
+
 function setDefaults() {
    // Set View:
-   switch(defaultView) {
-      case "Arrange":
-         application.setPanelLayout("ARRANGE");
-         break;
-      case "Mix":
-         application.setPanelLayout("MIX");
-         break;
-      case "Edit":
-         application.setPanelLayout("EDIT");
-         break;
-   }
+   application.setPanelLayout(defaultView);
    // Set Arranger View Settings:
    arranger.isClipLauncherVisible().set(defaultClipLauncher);
    arranger.isTimelineVisible().set(defaultTimeline);
@@ -439,55 +480,22 @@ function setDefaults() {
    cMix.isMeterSectionVisible().set(defaultMixMeters);
    cMix.isDeviceSectionVisible().set(defaultMixDevice);
    cMix.isSendSectionVisible().set(defaultMixSends);
-   cMix.isIoSectionVisible().set(defaultIO);
+   cMix.isIoSectionVisible().set(defaultMixIO);
    cMix.isCrossFadeSectionVisible().set(defaultMixAB);
 
    // Create Tracks:
-   if(currentChannelCount === 4){
-      for(var i = 1; i < defaultInstrumentTracks; i++) {
-         application.createInstrumentTrack(0);
-      }
-      for(var i = 1; i < defaultAudioTracks; i++) {
-         application.createAudioTrack(-1);
-      }
-      for(var i = 1; i < defaultEffectTracks; i++) {
+   if (currentChannelCount === 4) {
+      for (var i = 1; i < defaultEffectTracks; i++) {
          application.createEffectTrack(-1);
       }
+      for (var i = 1; i < defaultAudioTracks; i++) {
+         application.createAudioTrack(-1);
+      }
+      for (var i = 1; i < defaultInstrumentTracks; i++) {
+         application.createInstrumentTrack(0);
+      }
    }
-   //switch (defaultBrowserPanel) {
-   //   case "Browser":
-   //      break;
-   //   case "Project":
-   //      actions[184].invoke();
-   //      //actions.getAction("184").invoke();
-   //
-   //      break;
-   //   case "IO Panel":
-   //      actions[183].invoke();
-   //      //actions.getAction("183").invoke();
-   //      break;
-   //}
-
 }
 
-function setDocument() {
-   arranger.areCueMarkersVisible().set(true);
-   arranger.isTimelineVisible().set(true);
-   arranger.isIoSectionVisible().set(true);
-   arranger.areEffectTracksVisible().set(true);
-   cMix.isCrossFadeSectionVisible().set(true);
-   //actions[144].invoke();
-   //actions[194].invoke();
-}
-
-function onMidi(status, data1, data2) {
-   printMidi(status, data1, data2);
-}
-
-function onSysex(data) {
-	printSysex(data);
-}
-
-function exit()
-{
+function exit() {
 }
