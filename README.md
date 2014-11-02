@@ -22,6 +22,8 @@ Non-Specific Controllers:
 - TomsGenericMultiControl (16 separate Midi Channels, Midi Beat Clock, all CCs mappable per Midi Channel...)
 - TomsMultiBiController (16 separate Midi Channels, Midi Beat Clock, all CCs mappable per Midi Channel, Bidirectional Feedback for CCs...)
 
+Utility:
+- "The Defaulter", a script that uses the Controller API to allow some basic defaults for projects and views in it's preferences. Also, it saves the current project settings in the IO Panel and restores these per-project.
 Enjoy!
 
 Cheers,
