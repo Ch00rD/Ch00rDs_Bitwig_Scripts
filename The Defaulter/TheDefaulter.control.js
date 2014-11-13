@@ -111,7 +111,7 @@ var documentMixABPref = null;
 var documentMixAB = false;
 
 // Other Variables:
-var currentChannelCount = 0;
+var currentChannelCount = 5000;
 var projectName = "";
 
 
@@ -159,10 +159,10 @@ function init() {
       }
    });
 
-   defaultViewPref = prefs.getEnumSetting("Initial View", "View Defaults", VIEWS, VIEWS[0]);
-   defaultViewPref.addValueObserver(function (value) {
-      defaultView = value;
-   });
+   //defaultViewPref = prefs.getEnumSetting("Initial View", "View Defaults", VIEWS, VIEWS[0]);
+   //defaultViewPref.addValueObserver(function (value) {
+   //   defaultView = value;
+   //});
 
    // Arranger Settings:
    defaultClipLauncherPref = prefs.getEnumSetting("ClipLauncher Visible", "Arranger View", YESNO, "No");
@@ -243,21 +243,21 @@ function init() {
          host.showPopupNotification(documentMessage);
       }
    });
-   documentViewPref = doc.getEnumSetting("Initial View", "Layout", VIEWS, VIEWS[0]);
-   documentViewPref.addValueObserver(function (value) {
-      println(value);
-      if(documentView != value){
-         documentView = value;
-         application.setPanelLayout(value);
-      }
-   });
-   application.addPanelLayoutObserver(function (view) {
-      println(view);
-      if (currentView != view) {
-         currentView = view;
-         documentViewPref.set(view);
-      }
-   }, 50);
+   //documentViewPref = doc.getEnumSetting("Initial View", "Layout", VIEWS, VIEWS[0]);
+   //documentViewPref.addValueObserver(function (value) {
+   //   println(value);
+   //   if(documentView != value){
+   //      documentView = value;
+   //      application.setPanelLayout(value);
+   //   }
+   //});
+   //application.addPanelLayoutObserver(function (view) {
+   //   println(view);
+   //   if (currentView != view) {
+   //      currentView = view;
+   //      documentViewPref.set(view);
+   //   }
+   //}, 50);
 
    // Arranger Settings:
    documentClipLauncherPref = doc.getEnumSetting("ClipLauncher Visible", "Arranger View", YESNO, "No");
@@ -418,54 +418,54 @@ function delayedSetter() {
 
 function setPrefsVisible(on) {
    // View:
-   on ? defaultGreetingPref.enable() : defaultGreetingPref.disable();
-   on ? defaultViewPref.enable() : defaultViewPref.disable();
+   on ? defaultGreetingPref.show() : defaultGreetingPref.hide();
+   //on ? defaultViewPref.show() : defaultViewPref.hide();
    // Arranger:
-   on ? defaultClipLauncherPref.enable() : defaultClipLauncherPref.disable();
-   on ? defaultTimelinePref.enable() : defaultTimelinePref.disable();
-   on ? defaultIOPref.enable() : defaultIOPref.disable();
-   on ? defaultEffectsPref.enable() : defaultEffectsPref.disable();
-   on ? defaultDoubleHeightPref.enable() : defaultDoubleHeightPref.disable();
-   on ? defaultCueMarkersPref.enable() : defaultCueMarkersPref.disable();
-   on ? defaultPlaybackFollowPref.enable() : defaultPlaybackFollowPref.disable();
+   on ? defaultClipLauncherPref.show() : defaultClipLauncherPref.hide();
+   on ? defaultTimelinePref.show() : defaultTimelinePref.hide();
+   on ? defaultIOPref.show() : defaultIOPref.hide();
+   on ? defaultEffectsPref.show() : defaultEffectsPref.hide();
+   on ? defaultDoubleHeightPref.show() : defaultDoubleHeightPref.hide();
+   on ? defaultCueMarkersPref.show() : defaultCueMarkersPref.hide();
+   on ? defaultPlaybackFollowPref.show() : defaultPlaybackFollowPref.hide();
    // Mixer:
-   on ? defaultMixClipsPref.enable() : defaultMixClipsPref.disable();
-   on ? defaultMixMetersPref.enable() : defaultMixMetersPref.disable();
-   on ? defaultMixDevicePref.enable() : defaultMixDevicePref.disable();
-   on ? defaultMixSendsPref.enable() : defaultMixSendsPref.disable();
-   on ? defaultMixIOPref.enable() : defaultMixIOPref.disable();
-   on ? defaultMixABPref.enable() : defaultMixABPref.disable();
+   on ? defaultMixClipsPref.show() : defaultMixClipsPref.hide();
+   on ? defaultMixMetersPref.show() : defaultMixMetersPref.hide();
+   on ? defaultMixDevicePref.show() : defaultMixDevicePref.hide();
+   on ? defaultMixSendsPref.show() : defaultMixSendsPref.hide();
+   on ? defaultMixIOPref.show() : defaultMixIOPref.hide();
+   on ? defaultMixABPref.show() : defaultMixABPref.hide();
 
    // Tracks:
-   on ? defaultInstrumentTracksPref.enable() : defaultInstrumentTracksPref.disable();
-   on ? defaultAudioTracksPref.enable() : defaultAudioTracksPref.disable();
-   on ? defaultEffectTracksPref.enable() : defaultEffectTracksPref.disable();
+   on ? defaultInstrumentTracksPref.show() : defaultInstrumentTracksPref.hide();
+   on ? defaultAudioTracksPref.show() : defaultAudioTracksPref.hide();
+   on ? defaultEffectTracksPref.show() : defaultEffectTracksPref.hide();
 }
 
 //function setDocPrefsVisible(on) {
 //   // View:
-//   on ? documentMessagePref.enable() : documentMessagePref.disable();
-//   on ? documentViewPref.enable() : documentViewPref.disable();
+//   on ? documentMessagePref.show() : documentMessagePref.hide();
+//   on ? documentViewPref.show() : documentViewPref.hide();
 //   // Arranger:
-//   on ? documentClipLauncherPref.enable() : documentClipLauncherPref.disable();
-//   on ? documentTimelinePref.enable() : documentTimelinePref.disable();
-//   on ? documentIOPref.enable() : documentIOPref.disable();
-//   on ? documentEffectsPref.enable() : documentEffectsPref.disable();
-//   on ? documentDoubleHeightPref.enable() : documentDoubleHeightPref.disable();
-//   on ? documentCueMarkersPref.enable() : documentCueMarkersPref.disable();
-//   on ? documentPlaybackFollowPref.enable() : documentPlaybackFollowPref.disable();
+//   on ? documentClipLauncherPref.show() : documentClipLauncherPref.hide();
+//   on ? documentTimelinePref.show() : documentTimelinePref.hide();
+//   on ? documentIOPref.show() : documentIOPref.hide();
+//   on ? documentEffectsPref.show() : documentEffectsPref.hide();
+//   on ? documentDoubleHeightPref.show() : documentDoubleHeightPref.hide();
+//   on ? documentCueMarkersPref.show() : documentCueMarkersPref.hide();
+//   on ? documentPlaybackFollowPref.show() : documentPlaybackFollowPref.hide();
 //   // Mixer:
-//   on ? documentMixClipsPref.enable() : documentMixClipsPref.disable();
-//   on ? documentMixMetersPref.enable() : documentMixMetersPref.disable();
-//   on ? documentMixDevicePref.enable() : documentMixDevicePref.disable();
-//   on ? documentMixSendsPref.enable() : documentMixSendsPref.disable();
-//   on ? documentMixIOPref.enable() : documentMixIOPref.disable();
-//   on ? documentMixABPref.enable() : documentMixABPref.disable();
+//   on ? documentMixClipsPref.show() : documentMixClipsPref.hide();
+//   on ? documentMixMetersPref.show() : documentMixMetersPref.hide();
+//   on ? documentMixDevicePref.show() : documentMixDevicePref.hide();
+//   on ? documentMixSendsPref.show() : documentMixSendsPref.hide();
+//   on ? documentMixIOPref.show() : documentMixIOPref.hide();
+//   on ? documentMixABPref.show() : documentMixABPref.hide();
 //}
 
 function setDefaults() {
    // Set View:
-   application.setPanelLayout(defaultView);
+   //application.setPanelLayout(defaultView);
    // Set Arranger View Settings:
    arranger.isClipLauncherVisible().set(defaultClipLauncher);
    arranger.isTimelineVisible().set(defaultTimeline);
