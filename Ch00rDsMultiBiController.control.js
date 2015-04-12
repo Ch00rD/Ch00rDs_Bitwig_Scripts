@@ -1,6 +1,6 @@
 //  Ch00rD's fork of Thonas Helzle's "TomsMultiBiController" script
 //  
-//  Enhanced Generic Controller Script for for Bitwig Studio with support for:
+//  Enhanced Generic Controller Script for Bitwig Studio with support for:
 //  - All 16 individual MIDI Channels + Omni mode as separate input ports
 //  - Mapping Poly Aftertouch to Expression
 //  - CCs fully mappable per MIDI Channel
