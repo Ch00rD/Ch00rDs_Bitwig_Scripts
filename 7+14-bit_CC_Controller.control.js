@@ -92,7 +92,7 @@ var ccValueOld = initArray(0, (LOW_RES_CC_RANGE * 16));
 // var isResetPressed = false;
 
 host.defineController("Ch00rD", 
-                      "Ch00rD's 7/14-bit CC Controller", 
+                      "7+14-bit_CC_Controller", 
                       "1.0", 
                       "9d51fc50-e057-11e4-b571-0800200c9a66", 
                       "Ch00rD"
