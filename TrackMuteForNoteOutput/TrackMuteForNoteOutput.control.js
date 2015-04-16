@@ -40,27 +40,19 @@ var mutePrevious = initArray(0, Config.tracksTotal);
 var channelIsActivated = initArray(0, Config.tracksTotal);
 
 /*
-// NOT WORKING YET :p
-// var cursorDevice = initArray(0, Config.tracksTotal);
-// var cursorDeviceName = initArray(0, Config.tracksTotal);
-// var trackDeviceBank = initArray(0, Config.tracksTotal);
-// var trackFirstDeviceName = initArray(0, Config.tracksTotal);
-*/
-
-/*
 // THIS (SIMPLISTIC) APPROACH WORKS, BUT DOES NOT DISCRIMINATE BETWEEN AUDIO VS. NON-AUDIO TRACKS
 // If track mute status has changed, set channel activation status to inverse of track mute status
 function getTrackMuteObserverFunc(index, varToStore)
 {
    return function(value)
    {
-	  // Reroute data directly into API
+	  // Reroute data directly into API - no need to handle observed changes in flush () !
 	  trackBank.getTrack(index).isActivated().set(!value);
    }
 }
 */
 
-// A function to create an indexed function for the Observers
+// A function to create an indexed function for observers
 function getValueObserverFunc(index, varToStore) {
     return function(value) {
         varToStore[index] = value;
@@ -102,7 +94,7 @@ function init ()
 //		track.getSolo().addValueObserver(getValueObserverFunc(t, solo));
 		
 /*		
-		// [TODO:] NOT WORKING YET :p
+		// [TODO:]
 		// Even more sophisticated (but also more complex) approach: 
 		// Instead of (de)activating tracks entirely, as currently implemented, 
 		// it would arguably be a much better approach to use the observed track 
@@ -111,36 +103,6 @@ function init ()
 		// non-audio tracks, to make the mute button affect their output of notes.
 		// 
 		// --> Find 1st device / check for type 'note filter' and/or name e.g. 'MIDI Mute' or 'Note Mute'
-		// ??? Not sure how to observe the name and enabled state of the 1st device in the device chain of a track/channel ???
-		// ...
-		
-		// create a (minimal) Device Bank to observe the first device in its device chain
-// 		track.createDeviceBank(1);
- 		trackDeviceBank[t] = track.createDeviceBank(1);
-		println("trackDeviceBank[" + t + "] = " + trackDeviceBank[t]);
-		
-// 		cursorDevice[t] = track.createCursorDevice("cursorDeviceForTrack" + t.toString());
-		var cursorDeviceName = "cursorDeviceForTrack" + t.toString();
-		cursorDevice[t] = track.createCursorDevice(cursorDeviceName);
- 		println("cursorDevice[" + t + "] = " + cursorDevice[t]);
-		
-		// Cf. <http://www.kvraudio.com/forum/viewtopic.php?p=5933330#p5933278>
-// 		cursorDevice.getChannelBank().getChannel(t).getDeviceBank().getDevice(0)
-// 		cursorDevice[t] = trackDeviceBank[t].getDevice(0);
-// 		println("cursorDevice[" + t + "] = " + cursorDevice[t]);
- 		
-// 		trackDeviceBank[t].getDevice(0).addNameObserver(getValueObserverFunc(t, trackFirstDeviceName));
-// 		cursorDevice[t].selectFirstInChannel(t);
-		
-//		track.getChannelBank().getChannel(t).getDeviceBank().getDevice(0).addNameObserver(getValueObserverFunc(t, trackFirstDeviceName));
-// 		trackDeviceBank[t].getDevice(0).addNameObserver(getValueObserverFunc(t, trackFirstDeviceName));
-
-		// CursorDevice --> selectFirstInChannel ?
-		// Device --> addNameObserver ?
-		//        --> addIsEnabledObserver ?
-		// PrimaryDevice.ChainLocation FIRST / LAST ?
-		// toggleEnabledState() ?
-		// ...
 */				
 	}
 	println("Initialized script: \"Track Mute For Note Output\"");
@@ -154,7 +116,6 @@ function flush ()
 {
 	for(var t=0; t<Config.tracksTotal; t++)
 	{
-// 		trackMuteStatusObject = trackBank.getTrack(t).getMute();
 // 		println("Track " + (t+1) + " | exists: " + trackExists[t] + " | can hold note data: " + trackCanHoldNoteData[t] + " | mute: " + mute[t] + " | activated: " + channelIsActivated[t]);
 		
 		// Only consider tracks that exist (since we may check for a much 
