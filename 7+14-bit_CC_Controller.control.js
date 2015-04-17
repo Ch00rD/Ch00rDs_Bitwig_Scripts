@@ -70,9 +70,9 @@ var LOG_SYSEX = false;
 // NB: may affect performance negatively - it is recommended to disable this if you don't need it; YMMV
 var DEBUG = false;
 
-// Do not tweak the variables below if you don't know what you're doing! :p
-
 //  ----------------------------------------------------------------------------
+
+// Do not tweak the variables below if you don't know what you're doing! :p
 
 // Calculate array sizes for storage of current and last previous value for each CC
 // 14-bit MSB/LSB CC pairs
@@ -87,9 +87,6 @@ var LOW_RES_CC_RANGE = (HIGHEST_7bit_CC - LOWEST_7bit_CC + 1);
 if (DEBUG) println("LOWEST_7bit_CC = " + LOWEST_7bit_CC + " | HIGHEST_7bit_CC = " + HIGHEST_7bit_CC + " --> LOW_RES_CC_RANGE = " + LOW_RES_CC_RANGE);
 var ccValue = initArray(0, (LOW_RES_CC_RANGE * 16));
 var ccValueOld = initArray(0, (LOW_RES_CC_RANGE * 16));
-
-// var isShiftPressed = false;
-// var isResetPressed = false;
 
 host.defineController("Ch00rD", 
                       "7/14-bit CC Controller", 
@@ -111,73 +108,83 @@ function getValueObserverFunc(index, varToStore) {
 function init() {
     if (LOWEST_7bit_CC <= HIGHEST_14bitLSB_CC) host.errorln("WARNING: configured 14-bit CC range overlapping with 7-bit CC range!\nPlease adjust your script settings to avoid errors!");
     
-    // Create 16 NoteInputs + Omni. Verbose to allow commenting out unneeded channels
-//  MultiBi   = host.getMidiInPort(0).createNoteInput("Omni", "??????");
-    MultiBi1  = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
-    MultiBi2  = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
-/*
-    MultiBi3  = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
-    MultiBi4  = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
-    MultiBi5  = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
-    MultiBi6  = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
-    MultiBi7  = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
-    MultiBi8  = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
-    MultiBi9  = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
-    MultiBi10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
-    MultiBi11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
-    MultiBi12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
-    MultiBi13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
-    MultiBi14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
-    MultiBi15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
-    MultiBi16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
-*/
-
-    // Disable the consuming of the events by the NoteInputs, so they are also available for mapping
-//  MultiBi.setShouldConsumeEvents(false);
-    MultiBi1.setShouldConsumeEvents(false);
-    MultiBi2.setShouldConsumeEvents(false);
-/*
-    MultiBi3.setShouldConsumeEvents(false);
-    MultiBi4.setShouldConsumeEvents(false);
-    MultiBi5.setShouldConsumeEvents(false);
-    MultiBi6.setShouldConsumeEvents(false);
-    MultiBi7.setShouldConsumeEvents(false);
-    MultiBi8.setShouldConsumeEvents(false);
-    MultiBi9.setShouldConsumeEvents(false);
-    MultiBi10.setShouldConsumeEvents(false);
-    MultiBi11.setShouldConsumeEvents(false);
-    MultiBi12.setShouldConsumeEvents(false);
-    MultiBi13.setShouldConsumeEvents(false);
-    MultiBi14.setShouldConsumeEvents(false);
-    MultiBi15.setShouldConsumeEvents(false);
-    MultiBi16.setShouldConsumeEvents(false);
-*/
-
+    // Create NoteInputs for Omni + 16 MIDI channels; 
+    // Disable the consuming of the events by the NoteInputs, so they are also available for mapping;
     // Enable Poly AT translation into Timbre for the internal Bitwig Studio instruments
-//  MultiBi.assignPolyphonicAftertouchToExpression(0,    NoteExpression.TIMBRE_UP, 5);
-    MultiBi1.assignPolyphonicAftertouchToExpression(0,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi2.assignPolyphonicAftertouchToExpression(1,   NoteExpression.TIMBRE_UP, 5);
-/*
-    MultiBi3.assignPolyphonicAftertouchToExpression(2,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi4.assignPolyphonicAftertouchToExpression(3,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi5.assignPolyphonicAftertouchToExpression(4,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi6.assignPolyphonicAftertouchToExpression(5,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi7.assignPolyphonicAftertouchToExpression(6,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi8.assignPolyphonicAftertouchToExpression(7,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi9.assignPolyphonicAftertouchToExpression(8,   NoteExpression.TIMBRE_UP, 5);
-    MultiBi10.assignPolyphonicAftertouchToExpression(9,  NoteExpression.TIMBRE_UP, 5);
-    MultiBi11.assignPolyphonicAftertouchToExpression(10, NoteExpression.TIMBRE_UP, 5);
-    MultiBi12.assignPolyphonicAftertouchToExpression(11, NoteExpression.TIMBRE_UP, 5);
-    MultiBi13.assignPolyphonicAftertouchToExpression(12, NoteExpression.TIMBRE_UP, 5);
-    MultiBi14.assignPolyphonicAftertouchToExpression(13, NoteExpression.TIMBRE_UP, 5);
-    MultiBi15.assignPolyphonicAftertouchToExpression(14, NoteExpression.TIMBRE_UP, 5);
-    MultiBi16.assignPolyphonicAftertouchToExpression(15, NoteExpression.TIMBRE_UP, 5);
-*/
+    // 
+    // Verbose to allow commenting out unneeded channels
+    Virus0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
+    Virus0.setShouldConsumeEvents(false);
+    Virus0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
+    Virus1.setShouldConsumeEvents(false);
+    Virus1.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus2 = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
+    Virus2.setShouldConsumeEvents(false);
+    Virus2.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus3 = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
+    Virus3.setShouldConsumeEvents(false);
+    Virus3.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus4 = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
+    Virus4.setShouldConsumeEvents(false);
+    Virus4.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus5 = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
+    Virus5.setShouldConsumeEvents(false);
+    Virus5.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus6 = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
+    Virus6.setShouldConsumeEvents(false);
+    Virus6.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus7 = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
+    Virus7.setShouldConsumeEvents(false);
+    Virus7.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus8 = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
+    Virus8.setShouldConsumeEvents(false);
+    Virus8.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus9 = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
+    Virus9.setShouldConsumeEvents(false);
+    Virus9.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
+    Virus10.setShouldConsumeEvents(false);
+    Virus10.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
+    Virus11.setShouldConsumeEvents(false);
+    Virus11.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
+    Virus12.setShouldConsumeEvents(false);
+    Virus12.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
+    Virus13.setShouldConsumeEvents(false);
+    Virus13.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
+    Virus14.setShouldConsumeEvents(false);
+    Virus14.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
+    Virus15.setShouldConsumeEvents(false);
+    Virus15.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    
+    Virus16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
+    Virus16.setShouldConsumeEvents(false);
+    Virus16.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
 
     // Enable MIDI Beat Clock
     host.getMidiOutPort(0).setShouldSendMidiBeatClock(SEND_MIDI_BEAT_CLOCK);
 
-    // Setting Callbacks for MIDI and SysEx
+    // Set callbacks for (plain) MIDI and SysEx
     host.getMidiInPort(0).setMidiCallback(onMidi);
     if (LOG_SYSEX)host.getMidiInPort(0).setSysexCallback(onSysex);
 
