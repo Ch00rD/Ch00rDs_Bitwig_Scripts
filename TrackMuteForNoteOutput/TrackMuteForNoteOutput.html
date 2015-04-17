@@ -24,9 +24,15 @@
         
         <p>This is achieved by linking the track mute state for instrument tracks (i.e. non-audio tracks) in Bitwig Studio to the activation state of tracks (/ channels).</p>
         
-        <p>The (maximum) number of tracks (excluding master track and effect tracks) being observed can be configured by the user. <br>It is recommended to set this to a relatively large number of tracks, at least as large as the total number of tracks in (all) your projects. <p>
+        <p>The (maximum) number of tracks (excluding master track and effect tracks) being observed can be configured by the user.
+        <br>It is recommended to set this to a relatively large number of tracks, at least as large as the total number of tracks in (all) your projects. <p>
         
         <p>(TODO:) A more sophisticated approach is planned, which only affects a track if the first device in its chain is of the Note Filter type, and its preset has some specific name, e.g. "Mute Notes").</p>
+        
+   		<p><strong>WARNING</strong>: may lead to 'hanging' notes sent between tracks (similar to 'hanging' MIDI notes), and also 'hanging' notes within the native instrument devices (which is a bit different; the *envelopes* of the notes also seem to 'hang').</p>
+
+        <p>NB: also see the "TrackMuteToTrackActivation_inverse" sibling script for a less sophisticated approach, that *also* affects audio-only tracks.
+        <br><strong>WARNING</strong>: Do not use these two scripts simultaneously!</p>
     </div>
     <div id="footer">
         Version Nr: 0.1 | Made by: Ch00rD

@@ -7,7 +7,7 @@ Config.SETTINGS_INDEX_TRACKS_TOTAL = 0;
 // Total number of tracks (excluding master track and effect tracks) being observed; 
 // perhaps best to use a relatively large number, at least as large as the 
 // total number of tracks in (all) your projects
-Config.tracksTotal = 100;
+Config.tracksTotal = 8;
 
 Config.init = function ()
 {

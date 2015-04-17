@@ -14,10 +14,19 @@
 // (TODO:) A more sophisticated approach is planned, which only affects a track 
 // if the first device in its chain is of the Note Filter type, and its preset 
 // has some specific name, e.g. "Mute Notes").
+// 
+// WARNING: may lead to 'hanging' notes sent between tracks (similar to 'hanging' 
+// MIDI notes), and also 'hanging' notes within the native instrument devices 
+// (which is a bit different; the *envelopes* of the notes also seem to 'hang'). 
+// 
+// NB: also see the "TrackMuteToTrackActivation_inverse" sibling script for a 
+// less sophisticated approach, that *also* affects audio-only tracks. 
+// WARNING: Do not use these two scripts simultaneously!
 
 loadAPI (1);
 
-load ("TrackMuteForNoteOutput.config.js"); // Configuration editable by user in Bitwig Studio
+// Configuration editable by user in Bitwig Studio
+load ("TrackMuteForNoteOutput.config.js");
 
 host.defineController("Ch00rD", 
 					  "Track Mute For Note Output", 
@@ -27,7 +36,7 @@ host.defineController("Ch00rD",
 					 );
 
 // NB: Bitwig Studio seems to ignore a Controller Script with no MIDI input/output 
-// configured - so just select a (virtual) MIDI input port that's not used/needed 
+// configured, so just (create and) select a (virtual) MIDI input port that's not used/needed 
 host.defineMidiPorts (0, 1);
 
 // Declare arrays for storing information sent by various observers of things happening in Bitwig Studio
@@ -39,18 +48,16 @@ var mutePrevious = initArray(0, Config.tracksTotal);
 // var solo = initArray(0, Config.tracksTotal);
 var channelIsActivated = initArray(0, Config.tracksTotal);
 
-/*
 // THIS (SIMPLISTIC) APPROACH WORKS, BUT DOES NOT DISCRIMINATE BETWEEN AUDIO VS. NON-AUDIO TRACKS
 // If track mute status has changed, set channel activation status to inverse of track mute status
 function getTrackMuteObserverFunc(index, varToStore)
 {
-   return function(value)
+   return function(isMuted)
    {
 	  // Reroute data directly into API - no need to handle observed changes in flush () !
-	  trackBank.getTrack(index).isActivated().set(!value);
+	  trackBank.getTrack(index).isActivated().set(!isMuted);
    }
 }
-*/
 
 // A function to create an indexed function for observers
 function getValueObserverFunc(index, varToStore) {
@@ -82,8 +89,11 @@ function init ()
 	{
 		var track = trackBank.getTrack(t);
 		
+// 		if (t===0) dump(trackBank.getTrack(t).getMute()); // dump first object
+
 // 		THIS (SIMPLISTIC) APPROACH WORKS, BUT DOES NOT DISCRIMINATE BETWEEN AUDIO VS. NON-AUDIO TRACKS
 // 		track.getMute().addValueObserver(getTrackMuteObserverFunc(t, mute));
+		// try to do the same as above, but using an inline function?
  		
 		// Slightly more sophisticated approach: check if track exists and can hold notes 
 		track.exists().addValueObserver(getValueObserverFunc(t, trackExists));
@@ -91,8 +101,7 @@ function init ()
 		track.getMute().addValueObserver(getValueObserverFunc(t, mute));
 		track.isActivated().addValueObserver(getValueObserverFunc(t, channelIsActivated));
 		// Support for solo is not yet implemented
-//		track.getSolo().addValueObserver(getValueObserverFunc(t, solo));
-		
+//		track.getSolo().addValueObserver(getValueObserverFunc(t, solo));	
 /*		
 		// [TODO:]
 		// Even more sophisticated (but also more complex) approach: 
@@ -116,6 +125,8 @@ function flush ()
 {
 	for(var t=0; t<Config.tracksTotal; t++)
 	{
+// 		trackMuteStatusObject = trackBank.getTrack(t).getMute();
+// 		if (t===0) dump(trackBank.getTrack(t).getMute()); // dump first object
 // 		println("Track " + (t+1) + " | exists: " + trackExists[t] + " | can hold note data: " + trackCanHoldNoteData[t] + " | mute: " + mute[t] + " | activated: " + channelIsActivated[t]);
 		
 		// Only consider tracks that exist (since we may check for a much 
