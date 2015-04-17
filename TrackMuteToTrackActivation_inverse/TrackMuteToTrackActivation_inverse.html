@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Bitwig Studio | Track Mute To Track Activation - Inverse</title>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en-us"/>
+    <meta http-equiv="imagetoolbar" content="no"/>
+    <meta name="MSSmartTagsPreventParsing" content="true"/>
+    <meta name="author" content="Ch00rD"/>
+    <style type="text/css" media="all">@import "../doc/bitwig.css";</style>
+</head>
+
+<body>
+<div id="page-container">
+    <div id="header">
+        <div id="logo">
+        </div>
+        <div id="title">
+            <h1>TRACK MUTE TO TRACK ACTIVATION - INVERSE</h1>
+        </div>
+    </div>
+    <div id="introduction">
+        <p>Bitwig Studio controller script, intended to enable muting the note output of note-only tracks.</p>
+        
+        <p>However, this is achieved in a VERY QUICK AND DIRTY manner, by linking the 
+		track mute state for FOR ALL TRACKS (i.e. also audio-only tracks) in Bitwig Studio 
+		to the activation state of tracks (/ channels).</p>
+		
+		<p>The (maximum) number of tracks (excluding master track and effect tracks) 
+		being observed can be configured by the user. 
+		<br>It is recommended to set this to a relatively small number of tracks, 
+		and reserve the same amount of tracks in (all) your projects for notes-only tracks.<p>
+		
+		<p><strong>WARNING</strong>: may lead to 'hanging' notes sent between tracks (similar to 'hanging' MIDI notes), 
+		and also 'hanging' notes within the native instrument devices (which is a bit different; 
+		the *envelopes* of the notes also seem to 'hang').</p>
+        
+        <p>NB: also see the "TrackMuteForNoteOutput" sibling script for a slightly 
+        more sophisticated approach, that does *not* affect audio-only tracks. 
+        <br><strong>WARNING</strong>: Do not use these two scripts simultaneously!</p>
+    </div>
+    <div id="footer">
+        Version Nr: 0.1 | Made by: Ch00rD
+    </div>
+</div>
+</body>
+</html>
