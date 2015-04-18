@@ -58,6 +58,10 @@ var HIGHEST_7bit_CC = 119;
 // set to 101 for a better match to values displayed as percentages (0.00% to 100%)
 var RESOLUTION_7_BIT = 128;
 
+// MIDI notes
+var LOWEST_NOTE = 0;
+var HIGHEST_NOTE = 120; 
+
 // Enable/disable sending MIDI Beat Clock from Bitwig Studio to the output connected to the MIDI controller device
 // NB: may affect performance negatively - it is recommended to disable this if you don't need it; YMMV
 var SEND_MIDI_BEAT_CLOCK = false;
@@ -78,15 +82,20 @@ var DEBUG = false;
 // 14-bit MSB/LSB CC pairs
 var LOWEST_14bitLSB_CC = LOWEST_14bitMSB_CC + 32;
 var HIGHEST_14bitLSB_CC = HIGHEST_14bitMSB_CC + 32;
-var HIGH_RES_CC_RANGE = (HIGHEST_14bitMSB_CC - LOWEST_14bitMSB_CC + 1);
+var HIGH_RES_CC_RANGE = HIGHEST_14bitMSB_CC - LOWEST_14bitMSB_CC + 1;
 if (DEBUG) println("LOWEST_14bitMSB_CC = " + LOWEST_14bitMSB_CC + " | HIGHEST_14bitMSB_CC = " + HIGHEST_14bitMSB_CC + " --> HIGH_RES_CC_RANGE = " + HIGH_RES_CC_RANGE);
 var ccPairValue = initArray(0, (HIGH_RES_CC_RANGE * 16));
 var ccPairValueOld = initArray(0, (HIGH_RES_CC_RANGE * 16));
 // 7-bit CCs
-var LOW_RES_CC_RANGE = (HIGHEST_7bit_CC - LOWEST_7bit_CC + 1);
+var LOW_RES_CC_RANGE = HIGHEST_7bit_CC - LOWEST_7bit_CC + 1;
 if (DEBUG) println("LOWEST_7bit_CC = " + LOWEST_7bit_CC + " | HIGHEST_7bit_CC = " + HIGHEST_7bit_CC + " --> LOW_RES_CC_RANGE = " + LOW_RES_CC_RANGE);
 var ccValue = initArray(0, (LOW_RES_CC_RANGE * 16));
 var ccValueOld = initArray(0, (LOW_RES_CC_RANGE * 16));
+// Notes
+var NOTE_RANGE = HIGHEST_NOTE - LOWEST_NOTE + 1;
+if (DEBUG) println("LOWEST_NOTE = " + LOWEST_NOTE + " | HIGHEST_NOTE = " + HIGHEST_NOTE + " --> NOTE_RANGE = " + NOTE_RANGE);
+var noteValue = initArray(0, (NOTE_RANGE * 16));
+var noteValueOld = initArray(0, (NOTE_RANGE * 16));
 
 host.defineController("Ch00rD", 
                       "7/14-bit CC Controller", 
@@ -113,73 +122,73 @@ function init() {
     // Enable Poly AT translation into Timbre for the internal Bitwig Studio instruments
     // 
     // Verbose to allow commenting out unneeded channels
-    Hi+LoResCCs0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
-    Hi+LoResCCs0.setShouldConsumeEvents(false);
-    Hi+LoResCCs0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
+    HiLoResCCs0.setShouldConsumeEvents(false);
+    HiLoResCCs0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
-    Hi+LoResCCs1.setShouldConsumeEvents(false);
-    Hi+LoResCCs1.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
+    HiLoResCCs1.setShouldConsumeEvents(false);
+    HiLoResCCs1.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs2 = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
-    Hi+LoResCCs2.setShouldConsumeEvents(false);
-    Hi+LoResCCs2.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs2 = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
+    HiLoResCCs2.setShouldConsumeEvents(false);
+    HiLoResCCs2.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs3 = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
-    Hi+LoResCCs3.setShouldConsumeEvents(false);
-    Hi+LoResCCs3.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs3 = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
+    HiLoResCCs3.setShouldConsumeEvents(false);
+    HiLoResCCs3.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs4 = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
-    Hi+LoResCCs4.setShouldConsumeEvents(false);
-    Hi+LoResCCs4.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs4 = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
+    HiLoResCCs4.setShouldConsumeEvents(false);
+    HiLoResCCs4.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs5 = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
-    Hi+LoResCCs5.setShouldConsumeEvents(false);
-    Hi+LoResCCs5.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs5 = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
+    HiLoResCCs5.setShouldConsumeEvents(false);
+    HiLoResCCs5.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs6 = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
-    Hi+LoResCCs6.setShouldConsumeEvents(false);
-    Hi+LoResCCs6.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs6 = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
+    HiLoResCCs6.setShouldConsumeEvents(false);
+    HiLoResCCs6.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs7 = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
-    Hi+LoResCCs7.setShouldConsumeEvents(false);
-    Hi+LoResCCs7.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs7 = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
+    HiLoResCCs7.setShouldConsumeEvents(false);
+    HiLoResCCs7.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs8 = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
-    Hi+LoResCCs8.setShouldConsumeEvents(false);
-    Hi+LoResCCs8.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs8 = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
+    HiLoResCCs8.setShouldConsumeEvents(false);
+    HiLoResCCs8.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs9 = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
-    Hi+LoResCCs9.setShouldConsumeEvents(false);
-    Hi+LoResCCs9.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs9 = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
+    HiLoResCCs9.setShouldConsumeEvents(false);
+    HiLoResCCs9.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
-    Hi+LoResCCs10.setShouldConsumeEvents(false);
-    Hi+LoResCCs10.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
+    HiLoResCCs10.setShouldConsumeEvents(false);
+    HiLoResCCs10.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
-    Hi+LoResCCs11.setShouldConsumeEvents(false);
-    Hi+LoResCCs11.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
+    HiLoResCCs11.setShouldConsumeEvents(false);
+    HiLoResCCs11.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
-    Hi+LoResCCs12.setShouldConsumeEvents(false);
-    Hi+LoResCCs12.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
+    HiLoResCCs12.setShouldConsumeEvents(false);
+    HiLoResCCs12.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
-    Hi+LoResCCs13.setShouldConsumeEvents(false);
-    Hi+LoResCCs13.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
+    HiLoResCCs13.setShouldConsumeEvents(false);
+    HiLoResCCs13.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
-    Hi+LoResCCs14.setShouldConsumeEvents(false);
-    Hi+LoResCCs14.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
+    HiLoResCCs14.setShouldConsumeEvents(false);
+    HiLoResCCs14.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
-    Hi+LoResCCs15.setShouldConsumeEvents(false);
-    Hi+LoResCCs15.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
+    HiLoResCCs15.setShouldConsumeEvents(false);
+    HiLoResCCs15.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Hi+LoResCCs16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
-    Hi+LoResCCs16.setShouldConsumeEvents(false);
-    Hi+LoResCCs16.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    HiLoResCCs16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
+    HiLoResCCs16.setShouldConsumeEvents(false);
+    HiLoResCCs16.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
 
     // Enable MIDI Beat Clock
     host.getMidiOutPort(0).setShouldSendMidiBeatClock(SEND_MIDI_BEAT_CLOCK);
@@ -188,16 +197,15 @@ function init() {
     host.getMidiInPort(0).setMidiCallback(onMidi);
     if (LOG_SYSEX)host.getMidiInPort(0).setSysexCallback(onSysex);
 
-    // Make 14-bit CC pairs 1-31/33-63 plus 7-bit CCs 64-119 freely mappable for all 16 MIDI channels
-    if (DEBUG) println("Creating " + (((HIGHEST_14bitMSB_CC - LOWEST_14bitMSB_CC +1) + (HIGHEST_7bit_CC - LOWEST_7bit_CC + 1))*16) + " User Control(s) and corresponding Value Observer(s) ... ");
-    userControls = host.createUserControls(((HIGHEST_14bitMSB_CC - LOWEST_14bitMSB_CC +1) + (HIGHEST_7bit_CC - LOWEST_7bit_CC + 1))*16);
+    if (DEBUG) println("Creating " + ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE + NOTE_RANGE)*16) + " User Control(s) and corresponding Value Observer(s) ... ");
+    userControls = host.createUserControls((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE + NOTE_RANGE)*16);
     
     // 14-bit CC pairs
     for (var i = LOWEST_14bitMSB_CC; i <= HIGHEST_14bitMSB_CC; i++) {
         for (var j = 1; j <= 16; j++) {
             // Create the index variable c
             var c = i - LOWEST_14bitMSB_CC + (j-1) * HIGH_RES_CC_RANGE;
-            if (DEBUG) println("[14-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c);
+            if (DEBUG) println("[14-bit] i = " + i + " | MIDI Ch. = " + j + " | c (index) = " + c);
             // Set a label/name for each userControl
             userControls.getControl(c).setLabel("CC " + i + "+" + (i+32) + " (14-bit) MIDI Ch. " + j);
             // Add a ValueObserver for each userControl
@@ -206,11 +214,11 @@ function init() {
     }
     
     // 7-bit CC messages
-    for(var i = LOWEST_7bit_CC; i <= HIGHEST_7bit_CC; i++) {
+    for (var i = LOWEST_7bit_CC; i <= HIGHEST_7bit_CC; i++) {
         for (var j = 1; j <= 16; j++) {
             // Create the index variable c
             var c = (HIGH_RES_CC_RANGE * 16) + i - LOWEST_7bit_CC + (j-1) * LOW_RES_CC_RANGE;
-            if (DEBUG) println("[7-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c);
+            if (DEBUG) println("[7-bit] i = " + i + " | MIDI Ch. = " + j + " | c (index) = " + c);
             // Set a label/name for each userControl
             userControls.getControl(c).setLabel("CC " + i + " (7bit) MIDI Ch. " + j);
             // Add a ValueObserver for each userControl
@@ -218,6 +226,19 @@ function init() {
         }
     }
     
+    // Notes
+    for (var i = LOWEST_NOTE; i <= HIGHEST_NOTE; i++) {
+        for (var j = 1; j <= 16; j++) {
+            // Create the index variable n
+            var n = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + i - LOWEST_NOTE + (j-1) * NOTE_RANGE;
+            if (DEBUG) println("[note] i = " + i + " | MIDI Ch. = " + j + " | n = " + n);
+            if ((DEBUG) && (n <= 1408)) dump(userControls.getControl(n));
+			// Set a label/name for each userControl
+			userControls.getControl(n).setLabel("Note " + i + " MIDI Ch. " + j);
+			// Add a ValueObserver for each userControl
+			userControls.getControl(n).addValueObserver(128, getValueObserverFunc(n, noteValue));
+        }
+    }
     if (DEBUG) println("---------- FINISHED INITIALIZATION ----------");
 }
 
@@ -232,8 +253,7 @@ function flush() {
             // Check if something has changed
             if (ccPairValue[c] != ccPairValueOld[c]) {
                 // If yes, send the updated value
-                if (DEBUG) println("[14-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c);
-                if (DEBUG) println("ccPairValue[c]: " + ccPairValue[c] + " --> MSB | LSB: " + ((ccPairValue[c] >> 7) & 0x7F) + " | " + (ccPairValue[c] & 0x7F));
+                if (DEBUG) println("[14-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccPairValue[c]: " + ccPairValue[c] + " --> MSB | LSB: " + ((ccPairValue[c] >> 7) & 0x7F) + " | " + (ccPairValue[c] & 0x7F));
                 sendChannelController(j-1, i, (ccPairValue[c] >> 7) & 0x7F); // send MSB
                 sendChannelController(j-1, i+32, ccPairValue[c] & 0x7F); // send LSB
                 // And update the value for the next check
@@ -249,8 +269,7 @@ function flush() {
             // Check if something has changed
             if (ccValue[c] != ccValueOld[c]) {
                 // If yes, send the updated value
-                if (DEBUG) println("[7-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c);
-                if (DEBUG) println("ccValue[c]: " + ccValue[c]);
+                if (DEBUG) println("[7-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccValue[c]: " + ccValue[c]);
                 sendChannelController(j-1, i, ccValue[c]);
                 // And update the value for the next check
                 ccValueOld[c] = ccValue[c];
@@ -258,12 +277,27 @@ function flush() {
         }
     }
 
+    // Handle notes
+    for (var i=LOWEST_NOTE ; i<=HIGHEST_NOTE; i++) {
+        for (var j=1; j<=16; j++) {
+            var n = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + i - LOWEST_NOTE + (j-1) * NOTE_RANGE;
+            // Check if something has changed
+            if (noteValue[n] != noteValueOld[n]) {
+                // If yes, send the updated value
+                if (DEBUG) println("[note] i = " + i + " | MIDI Ch. = " + j + " | n = " + n + " | noteValue[n]: " + noteValue[n]);
+                sendNoteOn(j-1, i, noteValue[n])
+                // And update the value for the next check
+                noteValueOld[n] = noteValue[n];
+            }
+        }
+    }
 }
 
 // Update the UserControls when MIDI data is received
 function onMidi(status, data1, data2) {
     if (DEBUG) printMidi(status, data1, data2);
 
+    // Handle MIDI continuous controllers (CCs)
     if (isChannelController(status)) {
         // Handle 7-bit CCs
         if (data1 >= LOWEST_7bit_CC && data1 <= HIGHEST_7bit_CC) {
@@ -294,10 +328,29 @@ function onMidi(status, data1, data2) {
             // Get MSB from current value, add new LSB (= data2), store new 14-bit value
             var current_MSB = (ccPairValue[index] >> 7) & 0x7F;
 //          var new_14bit_value = (current_MSB << 7) + data2;
-            var new_14bit_value = (current_MSB << 7) | data2; // bitwise operator may be slightly faster?
+            var new_14bit_value = (current_MSB << 7) | data2; // bitwise operator may be slightly faster than addition?
             ccPairValue[index] = ccPairValueOld[index] = new_14bit_value;
             userControls.getControl(index).set(new_14bit_value, RESOLUTION_14_BIT);
             if (DEBUG) println("[14-bit LSB] index = " + index);
+        }
+    }
+    // Handle MIDI notes
+    // function isNoteOff(status, data2) { return ((status & 0xF0) == 0x80) || ((status & 0xF0) == 0x90 && data2 == 0); }
+	// function isNoteOn(status) { return (status & 0xF0) == 0x90; }
+	// Handle note-on events
+    if (isNoteOn(status)) {
+        if (data1 >= LOWEST_NOTE && data1 <= HIGHEST_NOTE) {
+            var index = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + data1 - LOWEST_NOTE + (NOTE_RANGE * MIDIChannel(status));
+            userControls.getControl(index).set(data2, 128);
+            if (DEBUG) println("[note-on] index = " + index);
+        }
+    }
+	// Handle note-off events; always send 0, even when non-zero note-off velocity is received 
+    if (isNoteOff(status)) {
+        if (data1 >= LOWEST_NOTE && data1 <= HIGHEST_NOTE) {
+            var index = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + data1 - LOWEST_NOTE + (NOTE_RANGE * MIDIChannel(status));
+            userControls.getControl(index).set(0, 128);
+            if (DEBUG) println("[note-off] index = " + index);
         }
     }
 }
