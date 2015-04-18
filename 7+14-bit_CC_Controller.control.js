@@ -113,73 +113,73 @@ function init() {
     // Enable Poly AT translation into Timbre for the internal Bitwig Studio instruments
     // 
     // Verbose to allow commenting out unneeded channels
-    Virus0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
-    Virus0.setShouldConsumeEvents(false);
-    Virus0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
+    Hi+LoResCCs0.setShouldConsumeEvents(false);
+    Hi+LoResCCs0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
-    Virus1.setShouldConsumeEvents(false);
-    Virus1.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
+    Hi+LoResCCs1.setShouldConsumeEvents(false);
+    Hi+LoResCCs1.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus2 = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
-    Virus2.setShouldConsumeEvents(false);
-    Virus2.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs2 = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
+    Hi+LoResCCs2.setShouldConsumeEvents(false);
+    Hi+LoResCCs2.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus3 = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
-    Virus3.setShouldConsumeEvents(false);
-    Virus3.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs3 = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
+    Hi+LoResCCs3.setShouldConsumeEvents(false);
+    Hi+LoResCCs3.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus4 = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
-    Virus4.setShouldConsumeEvents(false);
-    Virus4.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs4 = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
+    Hi+LoResCCs4.setShouldConsumeEvents(false);
+    Hi+LoResCCs4.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus5 = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
-    Virus5.setShouldConsumeEvents(false);
-    Virus5.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs5 = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
+    Hi+LoResCCs5.setShouldConsumeEvents(false);
+    Hi+LoResCCs5.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus6 = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
-    Virus6.setShouldConsumeEvents(false);
-    Virus6.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs6 = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
+    Hi+LoResCCs6.setShouldConsumeEvents(false);
+    Hi+LoResCCs6.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus7 = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
-    Virus7.setShouldConsumeEvents(false);
-    Virus7.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs7 = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
+    Hi+LoResCCs7.setShouldConsumeEvents(false);
+    Hi+LoResCCs7.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus8 = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
-    Virus8.setShouldConsumeEvents(false);
-    Virus8.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs8 = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
+    Hi+LoResCCs8.setShouldConsumeEvents(false);
+    Hi+LoResCCs8.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus9 = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
-    Virus9.setShouldConsumeEvents(false);
-    Virus9.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs9 = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
+    Hi+LoResCCs9.setShouldConsumeEvents(false);
+    Hi+LoResCCs9.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
-    Virus10.setShouldConsumeEvents(false);
-    Virus10.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
+    Hi+LoResCCs10.setShouldConsumeEvents(false);
+    Hi+LoResCCs10.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
-    Virus11.setShouldConsumeEvents(false);
-    Virus11.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
+    Hi+LoResCCs11.setShouldConsumeEvents(false);
+    Hi+LoResCCs11.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
-    Virus12.setShouldConsumeEvents(false);
-    Virus12.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
+    Hi+LoResCCs12.setShouldConsumeEvents(false);
+    Hi+LoResCCs12.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
-    Virus13.setShouldConsumeEvents(false);
-    Virus13.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
+    Hi+LoResCCs13.setShouldConsumeEvents(false);
+    Hi+LoResCCs13.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
-    Virus14.setShouldConsumeEvents(false);
-    Virus14.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
+    Hi+LoResCCs14.setShouldConsumeEvents(false);
+    Hi+LoResCCs14.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
-    Virus15.setShouldConsumeEvents(false);
-    Virus15.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
+    Hi+LoResCCs15.setShouldConsumeEvents(false);
+    Hi+LoResCCs15.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
-    Virus16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
-    Virus16.setShouldConsumeEvents(false);
-    Virus16.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+    Hi+LoResCCs16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
+    Hi+LoResCCs16.setShouldConsumeEvents(false);
+    Hi+LoResCCs16.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
 
     // Enable MIDI Beat Clock
     host.getMidiOutPort(0).setShouldSendMidiBeatClock(SEND_MIDI_BEAT_CLOCK);
