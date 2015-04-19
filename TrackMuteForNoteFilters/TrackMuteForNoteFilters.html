@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Bitwig Studio | Track Mute For Note Filters</title>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en-us"/>
+    <meta http-equiv="imagetoolbar" content="no"/>
+    <meta name="MSSmartTagsPreventParsing" content="true"/>
+    <meta name="author" content="Ch00rD"/>
+    <style type="text/css" media="all">@import "../doc/bitwig.css";</style>
+</head>
+
+<body>
+<div id="page-container">
+    <div id="header">
+        <div id="logo">
+        </div>
+        <div id="title">
+            <h1>TRACK MUTE FOR NOTE FILTERS</h1>
+        </div>
+    </div>
+    <div id="introduction">
+        <p>Bitwig Studio controller script, intended to enable muting the note output of non-audio tracks.</p> 
+        
+        <p>This is achieved by linking the track mute state for instrument tracks 
+        (i.e. non-audio tracks) in Bitwig Studio to the activation state of Note 
+        Filter devices in specific tracks (only - for usability reasons), namely 
+        those which have been configured (by the Bitwig Studio user) as 'Primary' 
+        device for a track, and are using a preset named "Mute All Notes" (which 
+        should be a preset that has both its (minimum and maximum) "velocity" 
+        parameters set to 0). </p>
+        
+        <p>The (maximum) number of tracks (excluding master track and effect tracks) 
+        being observed can be configured by the user.
+        <br>It is recommended to set this to a relatively large number of tracks, 
+        at least as large as the total number of tracks in (all) your projects. <p>
+        
+   		<p><strong>WARNING</strong>: may lead to 'hanging' notes sent between tracks (similar to 'hanging' MIDI notes), and also 'hanging' notes within the native instrument devices (which is a bit different; the *envelopes* of the notes also seem to 'hang').</p>
+
+        <p>NB: also see the "TrackMuteForNoteOutput" and "TrackMuteToTrackActivation_inverse" 
+        sibling scripts for less sophisticated approaches, that disable the entire track, 
+        and (for the latter) *also* affects audio-only tracks.
+        <br><strong>WARNING</strong>: Do not try to use more than one of these 
+        scripts simultaneously as this may lead unexpected results; this has 
+        not been tested.</p>
+    </div>
+    <div id="footer">
+        Version Nr: 0.1 | Made by: Ch00rD
+    </div>
+</div>
+</body>
+</html>
