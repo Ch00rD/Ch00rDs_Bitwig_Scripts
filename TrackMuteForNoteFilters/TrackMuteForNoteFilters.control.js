@@ -15,12 +15,9 @@
 // to a relatively large number of tracks, at least as large as the total number 
 // of tracks in (all) your projects.
 // 
-// WARNING: may (very occasionally) lead to 'hanging' notes sent between tracks 
-// (similar to the classic 'hanging' MIDI notes problem), and also 'hanging' notes 
-// within the native instrument devices (which seems to be of a slightly different 
-// nature, as e.g. the *envelopes* of the notes also seem to be 'hanging' in some state). 
-// 
-// NB: also see the "TrackMuteForNoteOutput" and "TrackMuteToTrackActivation_inverse" sibling scripts for less sophisticated approaches, that disable the entire track, and (for the latter) *also* affects audio-only tracks.
+// NB: also see the "TrackMuteForNoteOutput" and "TrackMuteToTrackActivation_inverse" 
+// sibling scripts for less sophisticated approaches, that disable the entire track, 
+// and (for the latter) *also* affects audio-only tracks.
 // WARNING: These scripts are intended as alternative approaches to a single issue. 
 // Do not try to use more than one of these scripts simultaneously as this may lead 
 // unexpected results; this has not been tested. 
@@ -28,7 +25,7 @@
 loadAPI (1);
 
 // Configuration editable by user in Bitwig Studio
-load ("TrackMuteForNoteOutput.config.js");
+load ("TrackMuteForNoteFilters.config.js");
 
 host.defineController("Ch00rD", 
 					  "Track Mute For Note Filters", 
@@ -52,10 +49,10 @@ var channelIsActivated = initArray(0, Config.tracksTotal);
 // var solo = initArray(0, Config.tracksTotal);
 var primaryDevice = initArray(0, Config.tracksTotal);
 var primaryDeviceName = initArray(0, Config.tracksTotal); 		// <-- addNameObserver
-// Not used currently, except for debugging
-var primaryDevicePosition = initArray(0, Config.tracksTotal); 	// <-- addPositionObserver
 var primaryDevicePresetName = initArray(0, Config.tracksTotal); // <-- addPresetNameObserver
 var primaryDeviceIsEnabled = initArray(0, Config.tracksTotal);	// <-- addIsEnabledObserver
+// Not used currently, except for debugging
+var primaryDevicePosition = initArray(0, Config.tracksTotal); 	// <-- addPositionObserver
 
 // THIS (SIMPLISTIC) APPROACH WORKS, BUT DOES NOT DISCRIMINATE BETWEEN AUDIO VS. NON-AUDIO TRACKS
 // If track mute status has changed, set channel activation status to inverse of track mute status
@@ -77,7 +74,6 @@ function getValueObserverFunc(index, varToStore) {
 
 function init ()
 {
-	println("################################################################################");
 	Config.init ();
 	
 	// a Trackbank is a set of tracks, sends and scenes in Bitwig exposed for control 
@@ -130,7 +126,7 @@ function init ()
 		// Observer to check whether device is switched on or off
 		primaryDevice[t].addIsEnabledObserver(getValueObserverFunc(t, primaryDeviceIsEnabled));
 	}	
-	println("Initialized script: \"Track Mute For Note Filters\"");
+// 	println("Initialized script: \"Track Mute For Note Filters\"");
 }
 
 function exit ()
