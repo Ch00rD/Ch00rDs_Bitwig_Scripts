@@ -253,7 +253,7 @@ function flush() {
             // Check if something has changed
             if (ccPairValue[c] != ccPairValueOld[c]) {
                 // If yes, send the updated value
-                if (DEBUG) println("[14-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccPairValue[c]: " + ccPairValue[c] + " --> MSB | LSB: " + ((ccPairValue[c] >> 7) & 0x7F) + " | " + (ccPairValue[c] & 0x7F));
+                if (DEBUG) println("[14-bit CC] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccPairValue[c]: " + ccPairValue[c] + " --> MSB | LSB: " + ((ccPairValue[c] >> 7) & 0x7F) + " | " + (ccPairValue[c] & 0x7F));
                 sendChannelController(j-1, i, (ccPairValue[c] >> 7) & 0x7F); // send MSB
                 sendChannelController(j-1, i+32, ccPairValue[c] & 0x7F); // send LSB
                 // And update the value for the next check
@@ -269,7 +269,7 @@ function flush() {
             // Check if something has changed
             if (ccValue[c] != ccValueOld[c]) {
                 // If yes, send the updated value
-                if (DEBUG) println("[7-bit] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccValue[c]: " + ccValue[c]);
+                if (DEBUG) println("[7-bit CC] i = " + i + " | MIDI Ch. = " + j + " | c = " + c + "ccValue[c]: " + ccValue[c]);
                 sendChannelController(j-1, i, ccValue[c]);
                 // And update the value for the next check
                 ccValueOld[c] = ccValue[c];
@@ -303,7 +303,7 @@ function onMidi(status, data1, data2) {
         if (data1 >= LOWEST_7bit_CC && data1 <= HIGHEST_7bit_CC) {
             var index = (HIGH_RES_CC_RANGE * 16) + data1 - LOWEST_7bit_CC + (LOW_RES_CC_RANGE * MIDIChannel(status));
             userControls.getControl(index).set(data2, RESOLUTION_7_BIT);
-            if (DEBUG) println("[7-bit] index = " + index);
+            if (DEBUG) println("[7-bit CC] index = " + index + " | MIDI Channel: " + (MIDIChannel(status) + 1) + " | CC: " + data1 + " | value: " + data2);
         }
         // Handle 14-bit CC pairs
         // MSB
@@ -320,7 +320,8 @@ function onMidi(status, data1, data2) {
             // it is recommended to comment it out, so the value is only set *after* a LSB message has been received
             // (including 'orphan' LSB messages, as required by the MIDI specs). 
 //             userControls.getControl(index).set(new_14bit_value, RESOLUTION_14_BIT);
-            if (DEBUG) println("[14-bit MSB] index = " + index);
+            if (DEBUG) println("[14-bit CC: MSB] index = " + index + " | MIDI Channel: " + (MIDIChannel(status) + 1) + " | CC: " + data1 + " | value: " + data2);
+
         }
         // LSB
         if (data1 >= LOWEST_14bitLSB_CC && data1 <= HIGHEST_14bitLSB_CC) {
@@ -331,7 +332,7 @@ function onMidi(status, data1, data2) {
             var new_14bit_value = (current_MSB << 7) | data2; // bitwise operator may be slightly faster than addition?
             ccPairValue[index] = ccPairValueOld[index] = new_14bit_value;
             userControls.getControl(index).set(new_14bit_value, RESOLUTION_14_BIT);
-            if (DEBUG) println("[14-bit LSB] index = " + index);
+            if (DEBUG) println("[14-bit CC: LSB] index = " + index + " | MIDI Channel: " + (MIDIChannel(status) + 1) + " | CC: " + data1 + " | value: " + data2 + " --> 14-bit: " + new_14bit_value);
         }
     }
     // Handle MIDI notes
@@ -342,7 +343,23 @@ function onMidi(status, data1, data2) {
         if (data1 >= LOWEST_NOTE && data1 <= HIGHEST_NOTE) {
             var index = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + data1 - LOWEST_NOTE + (NOTE_RANGE * MIDIChannel(status));
             userControls.getControl(index).set(data2, 128);
-            if (DEBUG) println("[note-on] index = " + index);
+            if (DEBUG) println("[note-on] index = " + index + " | MIDI Channel: " + (MIDIChannel(status) + 1) + " | note: " + data1 + " | velocity: " + data2);
+            
+            // Link (index of) MIDI note numbers to (index of) mapped CCs to enable various functions
+            // [TODO:] add safety checks, 'modifier' buttons
+            var linkedCC = (index - ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16));
+            // dump(userControls.getControl(linkedCC));
+            // if (DEBUG) println("[note-on] index = " + index + " --> " + linkedCC + "| MIDI Channel: " + (MIDIChannel(status) + 1) + " | note: " + data1 + " | velocity: " + data2);
+            if (DEBUG) println("MIDI Channel " + (MIDIChannel(status) + 1) + " | note number " + data1 + " --> linked to CC: " + userControls.getControl(linkedCC).getLabel());
+            
+            // Restore automation control (i.e. change green dot on mapped controller assignment back to blue dot)
+            if (data2 > 0) userControls.getControl(linkedCC).restoreAutomationControl();
+            
+            // Touch-sensitive automation recording
+            // userControls.getControl(linkedCC).touch(data2 > 0);
+            
+            // Reset to default value
+            // if (data2 > 0) userControls.getControl(linkedCC).reset();
         }
     }
 	// Handle note-off events; always send 0, even when non-zero note-off velocity is received 
@@ -351,6 +368,7 @@ function onMidi(status, data1, data2) {
             var index = ((HIGH_RES_CC_RANGE + LOW_RES_CC_RANGE) * 16) + data1 - LOWEST_NOTE + (NOTE_RANGE * MIDIChannel(status));
             userControls.getControl(index).set(0, 128);
             if (DEBUG) println("[note-off] index = " + index);
+            println("[note-off] index = " + index + " | MIDI Channel: " + (MIDIChannel(status) + 1) + " | note: " + data1 + " | velocity: " + data2);
         }
     }
 }
