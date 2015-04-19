@@ -44,9 +44,10 @@ var trackExists = initArray(0, Config.tracksTotal);
 var trackCanHoldNoteData = initArray(0, Config.tracksTotal); // Perhaps perform the inverse check instead: getCanHoldAudioData ?
 var mute = initArray(0, Config.tracksTotal);
 var mutePrevious = initArray(0, Config.tracksTotal);
+// Not really needed, only for debugging
+var channelIsActivated = initArray(0, Config.tracksTotal);
 // Support for solo is not yet implemented
 // var solo = initArray(0, Config.tracksTotal);
-var channelIsActivated = initArray(0, Config.tracksTotal);
 
 // THIS (SIMPLISTIC) APPROACH WORKS, BUT DOES NOT DISCRIMINATE BETWEEN AUDIO VS. NON-AUDIO TRACKS
 // If track mute status has changed, set channel activation status to inverse of track mute status
@@ -96,23 +97,31 @@ function init ()
 		// try to do the same as above, but using an inline function?
  		
 		// Slightly more sophisticated approach: check if track exists and can hold notes 
+		track.getMute().addValueObserver(getValueObserverFunc(t, mute));
 		track.exists().addValueObserver(getValueObserverFunc(t, trackExists));
 		track.getCanHoldNoteData().addValueObserver(getValueObserverFunc(t, trackCanHoldNoteData));
-		track.getMute().addValueObserver(getValueObserverFunc(t, mute));
+		// Not really needed, only for debugging
 		track.isActivated().addValueObserver(getValueObserverFunc(t, channelIsActivated));
 		// Support for solo is not yet implemented
 //		track.getSolo().addValueObserver(getValueObserverFunc(t, solo));	
 /*		
 		// [TODO:]
 		// Even more sophisticated (but also more complex) approach: 
-		// Instead of (de)activating tracks entirely, as currently implemented, 
-		// it would arguably be a much better approach to use the observed track 
-		// mute (and solo) state to switch on/off Note Filter devices (preferably with 
-		// a specific preset name) that are placed at the very start of the chain in 
-		// non-audio tracks, to make the mute button affect their output of notes.
+		// Instead of (de)activating tracks entirely, it is arguably a much better 
+		// approach to use the observed track mute (and solo) state to switch on/off 
+		// Note Filter devices with a specific preset name ("Mute All Notes") that 
+		// are configured as 'Primary' device (and are  placed at the very start of 
+		// the chain) in non-audio tracks, to make the mute button (also) affect the 
+		// output of notes.
 		// 
 		// --> Find 1st device / check for type 'note filter' and/or name e.g. 'MIDI Mute' or 'Note Mute'
 */				
+		primaryDevice[t] = track.createCursorDevice("Primary");
+//		primaryDevice[t] = track.createCursorDevice("Primary" + t.toString());
+		primaryDevice[t].addNameObserver(16, "Unassigned", (getValueObserverFunc(t, primaryDeviceName)));
+		primaryDevice[t].addPresetNameObserver(16, "Unassigned", (getValueObserverFunc(t, primaryDevicePresetName)));
+		primaryDevice[t].addPositionObserver(getValueObserverFunc(t, primaryDevicePosition));
+		primaryDevice[t].addIsEnabledObserver(getValueObserverFunc(t, primaryDeviceIsEnabled));
 	}
 	println("Initialized script: \"Track Mute For Note Output\"");
 }
@@ -125,8 +134,6 @@ function flush ()
 {
 	for(var t=0; t<Config.tracksTotal; t++)
 	{
-// 		trackMuteStatusObject = trackBank.getTrack(t).getMute();
-// 		if (t===0) dump(trackBank.getTrack(t).getMute()); // dump first object
 // 		println("Track " + (t+1) + " | exists: " + trackExists[t] + " | can hold note data: " + trackCanHoldNoteData[t] + " | mute: " + mute[t] + " | activated: " + channelIsActivated[t]);
 		
 		// Only consider tracks that exist (since we may check for a much 
@@ -140,7 +147,7 @@ function flush ()
 			if (mute[t] != mutePrevious[t]) 
 			{
 				trackBank.getTrack(t).isActivated().set(!mute[t]);
-				mutePrevious[t] = mute[t];
+				mutePrevious[t] = mute[t]; // update previous value 
 			}			
 		}
 	}
