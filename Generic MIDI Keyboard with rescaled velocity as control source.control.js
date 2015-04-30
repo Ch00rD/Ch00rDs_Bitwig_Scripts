@@ -16,6 +16,9 @@ loadAPI(1);
 host.defineController("Generic", "MIDI Keyboard with rescaled velocity as control source", "0.1", "9725ddc0-ed08-11e4-b80c-0800200c9a66");
 host.defineMidiPorts(1, 0);
 
+// TWEAK THIS VALUE for different curves; 1.0 = linear, 0.0 to 1.0 = logarithmic curves; > 1 = exponential curves
+var EXPONENT = 1.0; 
+
 var LOWEST_CC = 1;
 var HIGHEST_CC = 119;
 
@@ -52,8 +55,7 @@ function onMidi(status, data1, data2)
         var index = HIGHEST_CC; // use index number right behind all CCs
         
         // Rescale velocity using exponential function
-        var exponent = 1.5; // TWEAK THIS VALUE for different curves; 1.0 = linear, > 1 for exponential curves
-        velocity = Math.pow((data2 / 127), exponent); // rescaling to 0-1 range to enable simple exponential function
+        velocity = Math.pow((data2 / 127), EXPONENT); // rescaling to 0-1 range to enable simple exponential function
         // (safety checks:) restrict velocity value to valid range
         if (velocity <= 0) {
 	        // Arguably, the minimum should be a positive value rather than 0... but smaller than 1/127?
@@ -61,7 +63,7 @@ function onMidi(status, data1, data2)
         } else if (velocity > 1) {
             velocity = 1;
         }
-        println("note-on velocity: " + data2 + " | exponent: " + exponent + " --> rescaled (0-1): " + velocity + " | (0-127): " + (velocity * 127));   
+        println("note-on velocity: " + data2 + " | exponent: " + EXPONENT + " --> rescaled (0-1): " + velocity + " | (0-127): " + (velocity * 127));   
         userControls.getControl(index).set(velocity, 1);
     }
 }
