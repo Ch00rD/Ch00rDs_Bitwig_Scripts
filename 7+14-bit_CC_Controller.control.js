@@ -25,9 +25,6 @@
       which sets the parameter value on reception of a MSB CC message). When processing 'orphan' 
       LSB messages (as required per the MIDI specs), it may also be useful to somehow reset/cancel 
       such a timer function.
-    
-    
-    - The above may be most useful with some MIDI controls used as so-called 'modifier' keys / buttons (cf. shift, alt, control) 
 
 */
 
