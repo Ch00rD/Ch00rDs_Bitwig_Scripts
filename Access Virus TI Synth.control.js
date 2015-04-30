@@ -36,49 +36,50 @@ function init()
     // Create NoteInputs for Omni + 16 MIDI channels; 
     // Disable the consuming of the events by the NoteInputs, so they are also available for mapping
     // Verbose to allow commenting out unneeded channels
-    Virus   = host.getMidiInPort(0).createNoteInput("Omni", "??????");
+    Virus   = host.getMidiInPort(0).createNoteInput("Virus Synth - Omni", "??????");
     Virus.setShouldConsumeEvents(false);
-    Virus1  = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
+    Virus.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 0);
+    Virus1  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 1", "?0????");
     Virus1.setShouldConsumeEvents(false);
-    Virus2  = host.getMidiInPort(0).createNoteInput("Ch 2", "?1????");
+    Virus2  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 2", "?1????");
     Virus2.setShouldConsumeEvents(false);
-    Virus3  = host.getMidiInPort(0).createNoteInput("Ch 3", "?2????");
+    Virus3  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 3", "?2????");
     Virus3.setShouldConsumeEvents(false);
-    Virus4  = host.getMidiInPort(0).createNoteInput("Ch 4", "?3????");
+    Virus4  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 4", "?3????");
     Virus4.setShouldConsumeEvents(false);
-    Virus5  = host.getMidiInPort(0).createNoteInput("Ch 5", "?4????");
+    Virus5  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 5", "?4????");
     Virus5.setShouldConsumeEvents(false);
-    Virus6  = host.getMidiInPort(0).createNoteInput("Ch 6", "?5????");
+    Virus6  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 6", "?5????");
     Virus6.setShouldConsumeEvents(false);
-    Virus7  = host.getMidiInPort(0).createNoteInput("Ch 7", "?6????");
+    Virus7  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 7", "?6????");
     Virus7.setShouldConsumeEvents(false);
-    Virus8  = host.getMidiInPort(0).createNoteInput("Ch 8", "?7????");
+    Virus8  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 8", "?7????");
     Virus8.setShouldConsumeEvents(false);
-    Virus9  = host.getMidiInPort(0).createNoteInput("Ch 9", "?8????");
+    Virus9  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 9", "?8????");
     Virus9.setShouldConsumeEvents(false);
-    Virus10 = host.getMidiInPort(0).createNoteInput("Ch 10", "?9????");
+    Virus10 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 10", "?9????");
     Virus10.setShouldConsumeEvents(false);
-    Virus11 = host.getMidiInPort(0).createNoteInput("Ch 11", "?A????");
+    Virus11 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 11", "?A????");
     Virus11.setShouldConsumeEvents(false);
-    Virus12 = host.getMidiInPort(0).createNoteInput("Ch 12", "?B????");
+    Virus12 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 12", "?B????");
     Virus12.setShouldConsumeEvents(false);
-    Virus13 = host.getMidiInPort(0).createNoteInput("Ch 13", "?C????");
+    Virus13 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 13", "?C????");
     Virus13.setShouldConsumeEvents(false);
-    Virus14 = host.getMidiInPort(0).createNoteInput("Ch 14", "?D????");
+    Virus14 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 14", "?D????");
     Virus14.setShouldConsumeEvents(false);
-    Virus15 = host.getMidiInPort(0).createNoteInput("Ch 15", "?E????");
+    Virus15 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 15", "?E????");
     Virus15.setShouldConsumeEvents(false);
-    Virus16 = host.getMidiInPort(0).createNoteInput("Ch 16", "?F????");
+    Virus16 = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 16", "?F????");
     Virus16.setShouldConsumeEvents(false);
 
     // Make (7-bit) CC messages for all 16 MIDI channels freely mappable
     userControls = host.createUserControls((HIGHEST_CC - LOWEST_CC + 1)*16);
-    for(var i = LOWEST_CC; i <= HIGHEST_CC; i++) {
+    for (var i = LOWEST_CC; i <= HIGHEST_CC; i++) {
         for (var j = 1; j <= 16; j++) {
             // Create the index variable c
             var c = i - LOWEST_CC + (j-1) * CC_RANGE;
             // Set a label/name for each userControl
-            userControls.getControl(c).setLabel("CC " + i + " (7bit) MIDI Ch. " + j);
+            userControls.getControl(c).setLabel("Virus: CC " + i + " (7bit) MIDI Ch. " + j);
         }
     }
 }
