@@ -113,9 +113,9 @@ function init() {
     // Enable Poly AT translation into Timbre for the internal Bitwig Studio instruments
     // 
     // Verbose to allow commenting out unneeded channels
-    HiLoResCCs0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
-    HiLoResCCs0.setShouldConsumeEvents(false);
-    HiLoResCCs0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
+//  HiLoResCCs0 = host.getMidiInPort(0).createNoteInput("Omni", "??????");
+//  HiLoResCCs0.setShouldConsumeEvents(false);
+//  HiLoResCCs0.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 5);
     
     HiLoResCCs1 = host.getMidiInPort(0).createNoteInput("Ch 1", "?0????");
     HiLoResCCs1.setShouldConsumeEvents(false);
