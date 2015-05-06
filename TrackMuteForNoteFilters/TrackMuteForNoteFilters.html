@@ -7,7 +7,7 @@
     <meta http-equiv="imagetoolbar" content="no"/>
     <meta name="MSSmartTagsPreventParsing" content="true"/>
     <meta name="author" content="Ch00rD"/>
-    <style type="text/css" media="all">@import "../doc/bitwig.css";</style>
+    <style type="text/css" media="all">@import "/Applications/Bitwig Studio.app/Contents/Resources/ControlSurfaceScripts/doc/bitwig.css";</style>
 </head>
 
 <body>
@@ -20,28 +20,32 @@
         </div>
     </div>
     <div id="introduction">
-        <p>Bitwig Studio controller script, intended to enable muting the note output of non-audio tracks.</p> 
+        <p>Bitwig Studio controller script, intended to enable muting the note output 
+        of "Instrument" tracks.</p> 
         
-        <p>This is achieved by linking the track mute state for instrument tracks 
-        (i.e. non-audio tracks) in Bitwig Studio to the activation state of Note 
-        Filter devices in specific tracks (only - for usability reasons), namely 
-        those which have been configured (by the Bitwig Studio user) as 'Primary' 
-        device for a track, and are using a preset named "Mute All Notes" (which 
-        should be a preset that has both its (minimum and maximum) "velocity" 
-        parameters set to 0). </p>
+        <p>This is achieved by linking the track mute state for "Instrument" tracks 
+        in Bitwig Studio to the activation state of Note Filter devices which have 
+        been configured (by the Bitwig Studio user) as 'Primary' device for a track, 
+        and are using a preset named "Mute All Notes" (which should be a preset that 
+        has both its (minimum and maximum) "velocity" parameters set to 0).</p>
+        
+        <p>Note, however, that <strong>this script does not mute the output of any 
+        other (MIDI) events</strong>, such as CCs, aftertouch, or pitch bend!</p>
+        
+        <p>Also note that <strong>this script may need to be reloaded whenever tracks are 
+		reordered</strong>, as the "Primary" devices the script initially creates for specific 
+		tracks 'stick' to those specific tracks, rather than a specific track number.
         
         <p>The (maximum) number of tracks (excluding master track and effect tracks) 
-        being observed can be configured by the user.
-        <br>It is recommended to set this to a relatively large number of tracks, 
-        at least as large as the total number of tracks in (all) your projects. <p>
+        being observed can be configured by the user. It is recommended to set this 
+        to a relatively large number of tracks, at least as large as the total number 
+        of tracks in (all) your projects. <p>
         
-   		<p><strong>WARNING</strong>: may lead to 'hanging' notes sent between tracks (similar to 'hanging' MIDI notes), and also 'hanging' notes within the native instrument devices (which is a bit different; the *envelopes* of the notes also seem to 'hang').</p>
-
-        <p>NB: also see the "TrackMuteForNoteOutput" and "TrackMuteToTrackActivation_inverse" 
-        sibling scripts for less sophisticated approaches, that disable the entire track, 
-        and (for the latter) *also* affects audio-only tracks.
+        <p>NB: also see the "TrackMuteForMIDIOutput" and "TrackMuteToTrackActivation_inverse" 
+        sibling scripts for less sophisticated approaches, which disable the entire track, 
+        and (in the latter case) *also* affects 'hybrid' and audio-only tracks.
         <br><strong>WARNING</strong>: Do not try to use more than one of these 
-        scripts simultaneously as this may lead unexpected results; this has 
+        scripts simultaneously as this may lead to unexpected results; this has 
         not been tested.</p>
     </div>
     <div id="footer">

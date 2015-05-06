@@ -36,9 +36,9 @@ function init()
     // Create NoteInputs for Omni + 16 MIDI channels; 
     // Disable the consuming of the events by the NoteInputs, so they are also available for mapping
     // Verbose to allow commenting out unneeded channels
-    Virus   = host.getMidiInPort(0).createNoteInput("Virus Synth - Omni", "??????");
-    Virus.setShouldConsumeEvents(false);
-    Virus.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 0);
+//  Virus   = host.getMidiInPort(0).createNoteInput("Virus Synth - Omni", "??????");
+//  Virus.setShouldConsumeEvents(false);
+//  Virus.assignPolyphonicAftertouchToExpression(0, NoteExpression.TIMBRE_UP, 0);
     Virus1  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 1", "?0????");
     Virus1.setShouldConsumeEvents(false);
     Virus2  = host.getMidiInPort(0).createNoteInput("Virus Synth - Ch 2", "?1????");
